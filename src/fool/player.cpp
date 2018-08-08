@@ -8,52 +8,64 @@ void FOOL_PLAYER::addToSet(std::vector<CARD*> cards){
         my_set.back()->changeFaceState(UP);//is_user ? UP : DOWN);
     }
 
-    setUpdated();
+    //sortSet();
+    itemsUpdate();
+
+    emit setUpdated();
 }
 std::vector<CARD*> FOOL_PLAYER::giveCard(){
     //palyer ходит ПО ОДНОЙ карте
     std::vector<CARD*> cards;
 
     cards.push_back(changed_card);
+    for (size_t i = 0; i < my_set.size(); i++)
+        if (my_set[i] == changed_card){
+            std::swap(my_set[i], my_set[0]);
+            my_set.erase(my_set.begin());
+            break;
+        }
 
-    setUpdated();
+
+    itemsUpdate();
+
+    emit setUpdated();
 
     return cards;
 }
 
-void FOOL_PLAYER::setUpdated(){
+void FOOL_PLAYER::itemsUpdate(){
+    if (!pl_set_view->card_btns.empty()){
 
-if (!pl_set_view->card_btns.empty())
-    for (size_t i = 0; i < pl_set_view->card_btns.size(); i++)
-        delete pl_set_view->card_btns[i];
-
-for (size_t i = 0; i < my_set.size(); i++){
-    QPoint p(80*i, 0);//880/2+(i-my_set.size()/2)*80,440);
-    CARD_BTN* c_b = new CARD_BTN(p, my_set[i]);
-    pl_set_view->card_btns.push_back(c_b);
-}
-
-for (size_t i = 0; i < pl_set_view->card_btns.size(); i++)
-    pl_set_view->card_btns[i]->setParentItem(pl_set_view);
-}
-
-void FOOL_PLAYER::changeCard(CARD* card){
-    changed_card = card;
-    /*
-    int r, s;
-    std::cin >> r >> s;
-
+        for (size_t i = 0; i < pl_set_view->card_btns.size(); i++)
+            delete pl_set_view->card_btns[i];
+    }
 
     for (size_t i = 0; i < my_set.size(); i++){
-        if (my_set[i]->getSuit() == (SUIT)s && my_set[i]->getRank() == r){
-            cards.push_back(my_set.at(i));
-            my_set.erase(my_set.begin() + i);
-            return cards;
-        }
+        double x = my_set.size() <= 6 ?
+                    80*(3 - (double)my_set.size()/2 + i) ://выравнивание по центру
+            (double)80*5*i/(my_set.size()-1);             //уплотнение набора
+        QPoint p(x, 0);
+        CARD_BTN* c_b = new CARD_BTN(p, my_set[i]);
+        pl_set_view->card_btns.push_back(c_b);
     }
-*/
 
+
+    for (size_t i = 0; i < pl_set_view->card_btns.size(); i++){
+        pl_set_view->card_btns[i]->setParentItem(pl_set_view);
+        QObject::connect(pl_set_view->card_btns[i], &CARD_BTN::btnMouseReleaseEvent,
+                         this, &FOOL_PLAYER::changeCard);
+    }
 }
+
+void FOOL_PLAYER::changeCard(Qt::MouseButton){
+    for (size_t i = 0; i < pl_set_view->card_btns.size(); i++)
+        if (pl_set_view->card_btns[i]->isChanged){
+            changed_card = my_set[i];
+            break;
+        }
+    qDebug() << changed_card->getSuit() << changed_card->getRank();
+}
+
 /*
 void FOOL_PLAYER::fillCardBtns(){
     for (size_t i = 0; i < my_set.size(); i++){
@@ -63,12 +75,13 @@ void FOOL_PLAYER::fillCardBtns(){
 }
 */
 
-void FOOL_PLAYER::initSetView(QPoint pos, int w, int h){
+void FOOL_PLAYER::initSetView(QPointF pos, int w, int h){
     pl_set_view = new FOOL_PLAYER_SET_VIEW(pos, w, h);
     set_view = pl_set_view;
     //if (!my_set.empty())
       //  fillCardBtns();
 }
+
 void FOOL_PLAYER::showMinTrump(){
 
 }

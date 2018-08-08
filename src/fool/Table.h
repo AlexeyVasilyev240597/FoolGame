@@ -32,7 +32,7 @@ public:
 	
 	SUIT getTrumpSuit();
 
-    void initSetView(QPoint pos, int w, int h);
+    void initSetView(QPointF pos, int w, int h);
 
     void addItems();
 };
@@ -46,11 +46,25 @@ public:
 };
 
 
-class FOOL_FIGHT_FIELD : public ELEMENT{
+class FOOL_FIGHT_FIELD : public QObject, public ELEMENT{
+Q_OBJECT
 public:
-	FOOL_FIGHT_FIELD() :ELEMENT(TO_ALL, 0){}
+    FOOL_FIGHT_FIELD_SET_VIEW *f_f_set_view;
+
+    enum FIELD_STATE{PLAYING, BEATEN_OFF, PICK_UP} state;
+
+    FOOL_FIGHT_FIELD() :ELEMENT(TO_ALL, 6){ state = PLAYING; }
 
     std::vector<CARD*> giveCard();
+
+    void initSetView(QPointF pos, int w, int h);
+
+    void addToSet(std::vector<CARD*> cards);
+
+    void itemsUpdate();
+
+signals:
+    void setUpdated();
 };
 
 

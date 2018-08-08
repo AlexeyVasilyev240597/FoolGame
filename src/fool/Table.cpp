@@ -26,13 +26,14 @@ SUIT FOOL_PRICUP::getTrumpSuit(){
 }
 
 
-void FOOL_PRICUP::initSetView(QPoint pos, int w, int h){
+void FOOL_PRICUP::initSetView(QPointF pos, int w, int h){
     pr_set_view = new FOOL_PRICUP_SET_VIEW(pos, w, h);
     set_view = pr_set_view;
 }
+
 void FOOL_PRICUP::addItems(){
     if(!my_set.empty()){
-        QPoint p(18, 0);
+        QPointF p(18, 0);
         pr_set_view->trumpImg = new CARD_ITEM(p, my_set.back());
         pr_set_view->trumpImg->setParentItem(pr_set_view);
         pr_set_view->trumpImg->setTransformOriginPoint(pr_set_view->trumpImg->mWidth/2, pr_set_view->trumpImg->mHeigth/2);
@@ -47,17 +48,58 @@ std::vector<CARD*> FOOL_BEATEN_OFF::giveCard(){
 	return cards;
 }
 
+void FOOL_FIGHT_FIELD::addToSet(std::vector<CARD*> cards){
+   my_set.push_back(cards[0]);
+   my_set.back()->changeFaceState(UP);
+
+   itemsUpdate();
+
+   emit setUpdated();
+}
+
+void FOOL_FIGHT_FIELD::itemsUpdate(){
+    if (!f_f_set_view->cards_in_fight.empty()){
+
+        for (size_t i = 0; i < f_f_set_view->cards_in_fight.size(); i++)
+            delete f_f_set_view->cards_in_fight[i];
+    }
+
+    for (size_t i = 0; i < my_set.size(); i++){
+        double x = 80 / 2 * (i % 6),
+               y = 116 * 5 / 4 * (i > 5) + 116 / 4 * (i % 2);
+
+        QPoint p(x, y);
+        CARD_ITEM* c = new CARD_ITEM(p, my_set[i]);
+        f_f_set_view->cards_in_fight.push_back(c);
+    }
+
+
+    for (size_t i = 0; i < f_f_set_view->cards_in_fight.size(); i++)
+        f_f_set_view->cards_in_fight[i]->setParentItem(f_f_set_view);
+}
+
 std::vector<CARD*> FOOL_FIGHT_FIELD::giveCard(){
     std::vector<CARD*> cards(my_set.size());
 
     my_set.swap(cards);
     my_set.clear();
 
+    itemsUpdate();
+
+    emit setUpdated();
+
     return cards;
 }
 
+void FOOL_FIGHT_FIELD::initSetView(QPointF pos, int w, int h){
+    f_f_set_view = new FOOL_FIGHT_FIELD_SET_VIEW(pos, w, h);
+    set_view = f_f_set_view;
+    //if (!my_set.empty())
+      //  fillCardBtns();
+}
+
 void DEALER::getOutCards(std::vector<ELEMENT*> &elems){
-    qDebug() << elems.size();
+    //qDebug() << elems.size();
 	for (size_t i = 0; i < elems.size(); i++){
 		if (elems[i]->getInitVolume() == 0)
 			continue;
@@ -84,46 +126,9 @@ void DEALER::getOutCards(std::vector<ELEMENT*> &elems){
 		elems[i]->addToSet(tmp_set);
 	}
 }
-
+/*
 void DEALER::exchange(ELEMENT* from, ELEMENT* to){
     //if (rules->isPossible(from, to))
         to->addToSet(from->giveCard());
 }
-
-/*
-class RULES{
-public:
-//enum CATEGORY{ TABLE, PLAYERS };
-std::map<string, size_t> *my_sets_volume;
-size_t max_num_of_players, how_many_cards_to_player;
-//switch over my_setS
-//virtual size_t howManyCards(CATEGORY cat, int key) = 0;// {
-//std::cout << "i'm in base class(((" << std::endl;
-//return 0;
-//}
-RULES(std::map<string, size_t> *s_v, size_t hmctp){
-my_sets_volume = s_v;
-how_many_cards_to_player = hmctp;
-}
-};
-
-//template <typename NAMES_OF_FIELDS, size_t num_of_fields, size_t num_of_players>
-class GAME{
-public:
-size_t num_of_players;
-GAME(size_t nop){
-num_of_players = nop;
-}
-
-RULES *rules;
-std::map<string, my_set*> table;
-std::vector<PLAYER> players;
-
-virtual void my_setRules() = 0;
-
-void initTable();//std::map<NAMES_OF_FIELDS, my_set*> &table);
-void initPlayers();//std::vector<PLAYER> &players);
-
-//virtual void toPlay() = 0;
-};
 */

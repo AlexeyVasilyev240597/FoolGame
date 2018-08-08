@@ -10,46 +10,42 @@
 #include "../drawing/GameItems.h"
 #include "Table.h"
 
-class FOOL_PLAYER :/*public QObject, */public ELEMENT{
-//Q_OBJECT
+class FOOL_PLAYER :public QObject, public ELEMENT{
+Q_OBJECT
 private:
     //std::vector<CARD*> my_set to std::map<CARD*, BUTTON*> card_button_set
     bool is_user{false};
     SUIT trump;
-    CARD *changed_card;
-    FOOL_FIGHT_FIELD *field;
+
+    FOOL_FIGHT_FIELD *field{NULL};
+    bool my_move{false};
 
     FOOL_PLAYER_SET_VIEW *pl_set_view;
     void sortSet();
 
-    //void fillCardBtns();
-
-//signals:
-  void setUpdated();//std::vector<CARD*>);
+    void itemsUpdate();
+signals:
+    void setUpdated();
 
 public:
+    CARD *changed_card{NULL};
+    enum PLAYER_STATE{NO_DEF, ATTACK, DEFENCE} state{NO_DEF};
     //пока не написана getMinTrump(), первым ходит первый игрок
-    FOOL_PLAYER(size_t iv,
-                FOOL_FIGHT_FIELD* f_f = NULL,
-                bool is_u = false) : ELEMENT(TO_HOLDER, iv){
-        is_user = is_u;
-        field = f_f;
-    }
+    FOOL_PLAYER(size_t iv) : ELEMENT(TO_HOLDER, iv){}
 
     std::vector<CARD*> giveCard();
-
-    //slote для button[i]->click
-    void changeCard(CARD*);
-
     void setTrump(SUIT tr){ trump = tr; }
 
     void showMinTrump();
 
-    void initSetView(QPoint, int, int);
+    void initSetView(QPointF, int, int);
 
     void addToSet(std::vector<CARD*> cards);
 
     //void drawSet();
+
+public slots:
+    void changeCard(Qt::MouseButton);
 };
 
 #endif // PLAYER_H

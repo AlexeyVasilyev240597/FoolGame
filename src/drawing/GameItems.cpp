@@ -97,6 +97,7 @@ void CARD_BTN::mouseReleaseEvent(QGraphicsSceneMouseEvent *apEvent)
 {
   //if(!mIsMoving)
     qWarning() << "release" << apEvent->button();
+    qDebug() << "it's click";
     isChanged = !isChanged;
     emit btnMouseReleaseEvent(apEvent->button());
 }

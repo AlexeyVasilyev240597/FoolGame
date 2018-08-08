@@ -28,7 +28,7 @@ public:
 
 class CARD_ITEM :public MY_ITEM{
 public:
-    CARD_ITEM(QPoint pos, CARD* c = NULL):MY_ITEM(pos, 0, 0){
+    CARD_ITEM(QPointF pos, CARD* c = NULL):MY_ITEM(pos, 0, 0){
         QString path = ":/pics/cards_pics/";
         if (c == NULL)
             path += "0/0.png";

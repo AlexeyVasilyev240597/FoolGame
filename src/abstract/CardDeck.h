@@ -111,7 +111,7 @@ public:
 				CARD c((SUIT)s, (RANK)r);
 				cards.push_back(c);
 			}
-		//toMix();
+        toMix();
 	}
 /*
 	void showDeck(){

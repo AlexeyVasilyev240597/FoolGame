@@ -51,7 +51,7 @@ public:
     MY_ITEM *set_view;
 
     //virtual void initSetView(QPoint pos, int w, int h) = 0   - потом сделай, когда для всех наслеников напишешь
-    virtual void initSetView(QPoint, int, int){}
+    virtual void initSetView(QPointF, int, int){}
 
     virtual void drawSet(){}
 };

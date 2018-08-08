@@ -1,45 +1,54 @@
 #include "Fool.h"
 #include "../abstract/gameelement.h"
+#include "player.h"
+#include "table.h"
 
 
 //later be in RULES
 #define PLAYER_VOLUME_INIT 6
 
-void FOOL_GAME::setElems(){
-    //for (size_t i = 0; i < 2; i++){
-        FOOL_PLAYER* pl1 = new FOOL_PLAYER(PLAYER_VOLUME_INIT);
-        FOOL_PLAYER* pl2 = new FOOL_PLAYER(PLAYER_VOLUME_INIT);
-        players.push_back(pl1);
-        players.push_back(pl2);
-        QPoint p1(240, 440);
-        players[0]->initSetView(p1, 80 * PLAYER_VOLUME_INIT, 116);
-        QPoint p2(240, 0);
-        players[1]->initSetView(p2, 80 * PLAYER_VOLUME_INIT, 116);
+FOOL_GAME::FOOL_GAME(){
+    dealer = new DEALER(_36_CARD_DECK);
 
-        pr = new FOOL_PRICUP(_36_CARD_DECK - PLAYER_VOLUME_INIT - PLAYER_VOLUME_INIT);
-        table.push_back(pr);
-        QPoint p(0, 252);
-        table[0]->initSetView(p, 116, 116);
+    pl1 = new FOOL_PLAYER(PLAYER_VOLUME_INIT);
+    pl2 = new FOOL_PLAYER(PLAYER_VOLUME_INIT);
+    QPointF p1(240, 495);
+    pl1->initSetView(p1, 80 * PLAYER_VOLUME_INIT, 145/*116*1.25*/);
+    QPointF p2(240, 0);
+    pl2->initSetView(p2, 80 * PLAYER_VOLUME_INIT, 145);
 
+    players.push_back(pl1);
+    players.push_back(pl2);
 
-        //emit initPlayer(players[i]->set_view);
-    //}
+    pr = new FOOL_PRICUP(_36_CARD_DECK - PLAYER_VOLUME_INIT - PLAYER_VOLUME_INIT);
+    QPointF p_pr(0, 262);
+    pr->initSetView(p_pr, 116, 116);
 
-    //FOOL_PRICUP *pr = new FOOL_PRICUP(_36_CARD_DECK - PLAYER_VOLUME_INIT - PLAYER_VOLUME_INIT);
-    //FOOL_BEATEN_OFF *b_off = new FOOL_BEATEN_OFF();
-    //FOOL_FIGHT_FIELD *f_f = new FOOL_FIGHT_FIELD();
+    field = new FOOL_FIGHT_FIELD();
+    QPointF p_f(300, 150);
+    field->initSetView(p_f, 360, 290);
 
-    //table = {pr, b_off, f_f};
-
+    table.push_back(pr);
+    table.push_back(field);
 }
+
 
 void FOOL_GAME::game()
 {
-    qDebug() << players.size();
+    //qDebug() << players.size();
     dealer->getOutCards(players);
 
     dealer->getOutCards(table);
     trump = pr->getTrumpSuit();
+
+    QObject::connect(pl1, &FOOL_PLAYER::setUpdated,
+                     this, &FOOL_GAME::someSetUpdated);
+
+    QObject::connect(pl2, &FOOL_PLAYER::setUpdated,
+                     this, &FOOL_GAME::someSetUpdated);
+
+    QObject::connect(field, &FOOL_FIGHT_FIELD::setUpdated,
+                     this, &FOOL_GAME::someSetUpdated);
     //players[0]->drawSet();
     //players[1]->drawSet();
 
@@ -72,4 +81,11 @@ void FOOL_GAME::game()
         cout << c[0]->getRank() << c[0]->getSuit() << endl;
 */
 
+}
+
+void FOOL_GAME::someSetUpdated(){
+    if (pl1->changed_card != NULL){
+        field->addToSet(pl1->giveCard());
+        pl1->changed_card = NULL;
+    }
 }

@@ -17,9 +17,9 @@ SCENE_VIEW::SCENE_VIEW()
   setWindowTitle("FOOL");
 
   setFrameStyle(0);
-  setSceneRect(0, 0, 880, 640);
+  setSceneRect(0, 0, 960, 640);
   setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
-  setFixedSize(880, 640);
+  setFixedSize(960, 640);
 
   mScene.setItemIndexMethod(QGraphicsScene::NoIndex);
 
@@ -48,11 +48,12 @@ void SCENE_VIEW::initGameScene(){
 }
 */
 void SCENE_VIEW::setGame(FOOL_GAME *g){
-    qDebug() << "i set game";
+    //qDebug() << "i set game";
     game = g;
     mScene.addItem(game->players[0]->set_view);
     mScene.addItem(game->players[1]->set_view);
     mScene.addItem(game->table[0]->set_view);
+    mScene.addItem(game->table[1]->set_view);
 }
 /*
 //------------------------------------------------------------------------------
