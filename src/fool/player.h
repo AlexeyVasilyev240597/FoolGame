@@ -25,7 +25,7 @@ private:
 
     void itemsUpdate();
 signals:
-    void setUpdated();
+    void chooseIsMade();
 
 public:
     CARD *changed_card{NULL};

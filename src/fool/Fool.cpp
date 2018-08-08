@@ -11,22 +11,18 @@ FOOL_GAME::FOOL_GAME(){
     dealer = new DEALER(_36_CARD_DECK);
 
     pl1 = new FOOL_PLAYER(PLAYER_VOLUME_INIT);
-    pl2 = new FOOL_PLAYER(PLAYER_VOLUME_INIT);
-    QPointF p1(240, 495);
-    pl1->initSetView(p1, 80 * PLAYER_VOLUME_INIT, 145/*116*1.25*/);
-    QPointF p2(240, 0);
-    pl2->initSetView(p2, 80 * PLAYER_VOLUME_INIT, 145);
+    pl2 = new FOOL_PLAYER(PLAYER_VOLUME_INIT);    
+    pl1->initSetView(QPointF(240, 495), 80 * PLAYER_VOLUME_INIT, 145/*116*1.25*/);
+    pl2->initSetView(QPointF(240, 0), 80 * PLAYER_VOLUME_INIT, 145);
 
     players.push_back(pl1);
     players.push_back(pl2);
 
     pr = new FOOL_PRICUP(_36_CARD_DECK - PLAYER_VOLUME_INIT - PLAYER_VOLUME_INIT);
-    QPointF p_pr(0, 262);
-    pr->initSetView(p_pr, 116, 116);
+    pr->initSetView(QPointF(0, 262), 116, 116);
 
     field = new FOOL_FIGHT_FIELD();
-    QPointF p_f(300, 150);
-    field->initSetView(p_f, 360, 290);
+    field->initSetView(QPointF(300, 150), 360, 290);
 
     table.push_back(pr);
     table.push_back(field);
@@ -41,14 +37,14 @@ void FOOL_GAME::game()
     dealer->getOutCards(table);
     trump = pr->getTrumpSuit();
 
-    QObject::connect(pl1, &FOOL_PLAYER::setUpdated,
+    QObject::connect(pl1, &FOOL_PLAYER::chooseIsMade,
                      this, &FOOL_GAME::someSetUpdated);
 
-    QObject::connect(pl2, &FOOL_PLAYER::setUpdated,
+    QObject::connect(pl2, &FOOL_PLAYER::chooseIsMade,
                      this, &FOOL_GAME::someSetUpdated);
 
-    QObject::connect(field, &FOOL_FIGHT_FIELD::setUpdated,
-                     this, &FOOL_GAME::someSetUpdated);
+    //QObject::connect(field, &FOOL_FIGHT_FIELD::setUpdated,
+                     //this, &FOOL_GAME::someSetUpdated);
     //players[0]->drawSet();
     //players[1]->drawSet();
 

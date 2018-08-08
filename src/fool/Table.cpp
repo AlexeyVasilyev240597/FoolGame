@@ -49,14 +49,23 @@ std::vector<CARD*> FOOL_BEATEN_OFF::giveCard(){
 }
 
 void FOOL_FIGHT_FIELD::addToSet(std::vector<CARD*> cards){
-   my_set.push_back(cards[0]);
+  for (size_t i = 0; i < cards.size(); i++){
+   my_set.push_back(cards[i]);
    my_set.back()->changeFaceState(UP);
+   size_t index = my_set.size()-1;
+   double x = 80 / 2 * (index % 6 % 2) + 80 * 1.5 * (index % 6 / 2),
+          y = 116 * 1.25 * (index > 5) + 116 *0.25 * (index % 2);
 
-   itemsUpdate();
+   CARD_ITEM* c = new CARD_ITEM(QPoint(x, y), my_set.back());
+   f_f_set_view->cards_in_fight.push_back(c);
+   f_f_set_view->cards_in_fight.back()->setParentItem(f_f_set_view);
+}
+
+
 
    emit setUpdated();
 }
-
+/*
 void FOOL_FIGHT_FIELD::itemsUpdate(){
     if (!f_f_set_view->cards_in_fight.empty()){
 
@@ -77,14 +86,14 @@ void FOOL_FIGHT_FIELD::itemsUpdate(){
     for (size_t i = 0; i < f_f_set_view->cards_in_fight.size(); i++)
         f_f_set_view->cards_in_fight[i]->setParentItem(f_f_set_view);
 }
-
+*/
 std::vector<CARD*> FOOL_FIGHT_FIELD::giveCard(){
     std::vector<CARD*> cards(my_set.size());
 
     my_set.swap(cards);
     my_set.clear();
 
-    itemsUpdate();
+    //itemsUpdate();
 
     emit setUpdated();
 

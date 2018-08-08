@@ -53,7 +53,7 @@ public:
 
     enum FIELD_STATE{PLAYING, BEATEN_OFF, PICK_UP} state;
 
-    FOOL_FIGHT_FIELD() :ELEMENT(TO_ALL, 6){ state = PLAYING; }
+    FOOL_FIGHT_FIELD() :ELEMENT(TO_ALL, 0){ state = PLAYING; }
 
     std::vector<CARD*> giveCard();
 
@@ -61,7 +61,7 @@ public:
 
     void addToSet(std::vector<CARD*> cards);
 
-    void itemsUpdate();
+    //void itemsUpdate();
 
 signals:
     void setUpdated();

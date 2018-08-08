@@ -11,7 +11,7 @@ void FOOL_PLAYER::addToSet(std::vector<CARD*> cards){
     //sortSet();
     itemsUpdate();
 
-    emit setUpdated();
+    //emit setUpdated();
 }
 std::vector<CARD*> FOOL_PLAYER::giveCard(){
     //palyer ходит ПО ОДНОЙ карте
@@ -28,7 +28,7 @@ std::vector<CARD*> FOOL_PLAYER::giveCard(){
 
     itemsUpdate();
 
-    emit setUpdated();
+    //emit setUpdated();
 
     return cards;
 }
@@ -38,6 +38,7 @@ void FOOL_PLAYER::itemsUpdate(){
 
         for (size_t i = 0; i < pl_set_view->card_btns.size(); i++)
             delete pl_set_view->card_btns[i];
+        pl_set_view->card_btns.clear();
     }
 
     for (size_t i = 0; i < my_set.size(); i++){
@@ -64,6 +65,7 @@ void FOOL_PLAYER::changeCard(Qt::MouseButton){
             break;
         }
     qDebug() << changed_card->getSuit() << changed_card->getRank();
+    emit chooseIsMade();
 }
 
 /*
