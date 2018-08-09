@@ -17,16 +17,20 @@ void CARD_BTN::mousePressEvent(QGraphicsSceneMouseEvent *){}
 
 void CARD_BTN::hoverEnterEvent(QGraphicsSceneHoverEvent*)
 {
-   // qDebug() << "enter";
-  mHover = true;
-  QGraphicsItem::update();
+    if (canIBeClicked){
+       // qDebug() << "enter";
+      mHover = true;
+      QGraphicsItem::update();
+    }
 }
 
 void CARD_BTN::hoverLeaveEvent(QGraphicsSceneHoverEvent*)
 {
-  //  qDebug() << "leave";
-  mHover = false;
-  QGraphicsItem::update();
+    if (canIBeClicked){
+      //  qDebug() << "leave";
+      mHover = false;
+      QGraphicsItem::update();
+    }
 }
 
 
@@ -35,6 +39,8 @@ void CARD_BTN::mouseReleaseEvent(QGraphicsSceneMouseEvent *apEvent)
   //if(!mIsMoving)
     //qWarning() << "release" << apEvent->button();
     //qDebug() << "it's click";
-    isChanged = !isChanged;
-    emit cardButtonClicked(apEvent->button());
+    if (canIBeClicked){
+        isChanged = !isChanged;
+        emit cardButtonClicked(apEvent->button());
+    }
 }

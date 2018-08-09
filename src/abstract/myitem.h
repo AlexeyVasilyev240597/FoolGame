@@ -59,7 +59,7 @@ class BUTTON : public QObject, public MY_ITEM{
 Q_OBJECT
 public:
     //size?!
-  BUTTON(QPointF pos, const QString text):MY_ITEM(pos, 40, 40){
+  BUTTON(QPointF pos, const QString text):MY_ITEM(pos, 38, 38){
       my_text = text;
       setAcceptedMouseButtons(Qt::LeftButton);
   }
@@ -69,6 +69,7 @@ public:
   void mousePressEvent(QGraphicsSceneMouseEvent *)  override;
   void mouseReleaseEvent(QGraphicsSceneMouseEvent *)override;
 
+  //bool canIBeClicked{false};
 signals:
   void buttonClicked(Qt::MouseButton);
 

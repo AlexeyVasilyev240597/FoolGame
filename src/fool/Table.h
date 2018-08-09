@@ -71,6 +71,7 @@ public:
 
 signals:
     void setUpdated();
+    void iFilled();
 };
 
 

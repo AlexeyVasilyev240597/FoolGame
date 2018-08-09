@@ -1,7 +1,5 @@
 #include <QApplication>
-#include <QObject>
-//#include "fool/Table.h"
-#include <QList>
+//#include <QObject>
 #include <QDebug>
 #include "src/drawing/GameScene.h"
 #include "src/fool/Fool.h"

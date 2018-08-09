@@ -9,8 +9,8 @@
 #include "Table.h"
 #include "Player.h"
 
-class   FOOL_RULES{
-//Q_OBJECT
+class   FOOL_RULES: public QObject{
+Q_OBJECT
 protected:
     SUIT trump;
     FOOL_PLAYER* pl1;
@@ -20,16 +20,18 @@ protected:
     FOOL_FIGHT_FIELD *field;
     FOOL_BEATEN *beaten;
 
-/*
+    void fillSetsOfPlayers();
+
 signals:
-    void initPlayer(MY_ITEM* item);
-    void initTableElem(MY_ITEM* item);
-*/
+    void transferMove();
+    void fieldFilled();
+    //void endLocalFight();
+
 };
 
 //но потом ты напишешь абстрактный класс CARD_GAME
 //two players, 36 card deck
-class   FOOL_GAME: public QObject, public FOOL_RULES{
+class   FOOL_GAME:public FOOL_RULES{
 Q_OBJECT
 private:
     DEALER* dealer;
@@ -40,8 +42,10 @@ public:
     std::vector<MY_ITEM*> getItems();
 
 public slots:
-    void someSetUpdated();
+    void playerChoosedCard();
+    //void finishHim();
     void throwToBeaten();
+    void giveToPlayer();
 /*
 signals:
     void initPlayer(MY_ITEM* item);

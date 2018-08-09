@@ -13,6 +13,11 @@ std::vector<CARD*> FOOL_PRICUP::giveCard(size_t number){
 		my_set.erase(my_set.begin());
 	}
 
+    if (my_set.size() <= 1)
+        delete pr_set_view->pileImg;
+
+    if (my_set.empty())
+        delete pr_set_view->trumpImg;
     qDebug() << "in Pricup " << this->getVolume() <<"cards";
 
 	return cards;
@@ -70,17 +75,21 @@ void FOOL_BEATEN::initSetView(QPointF pos, int w, int h){
 
 //-----------------------------FIELD-----------------------------
 void FOOL_FIGHT_FIELD::addToSet(std::vector<CARD*> cards){
-  for (size_t i = 0; i < cards.size(); i++){
-   my_set.push_back(cards[i]);
-   my_set.back()->changeFaceState(UP);
-   size_t index = my_set.size()-1;
-   double x = 80 / 2 * (index % 6 % 2) + 80 * 1.5 * (index % 6 / 2),
-          y = 116 * 1.25 * (index > 5) + 116 *0.25 * (index % 2);
+    for (size_t i = 0; i < cards.size(); i++){
+       my_set.push_back(cards[i]);
+       my_set.back()->changeFaceState(UP);
+       size_t index = my_set.size()-1;
+       double x = 80 / 2 * (index % 6 % 2) + 80 * 1.5 * (index % 6 / 2),
+              y = 116 * 1.25 * (index > 5) + 116 * 0.25 * (index % 2);
 
-   CARD_ITEM* c = new CARD_ITEM(QPoint(x, y), my_set.back());
-   f_f_set_view->cards_in_fight.push_back(c);
-   f_f_set_view->cards_in_fight.back()->setParentItem(f_f_set_view);
-}
+       CARD_ITEM* c = new CARD_ITEM(QPoint(x, y), my_set.back());
+       f_f_set_view->cards_in_fight.push_back(c);
+       f_f_set_view->cards_in_fight.back()->setParentItem(f_f_set_view);
+
+       //6 * 2 )))
+       if (my_set.size() == 6 * 2)
+        emit iFilled();
+    }
 
 
 

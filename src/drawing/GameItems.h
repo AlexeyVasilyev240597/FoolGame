@@ -39,6 +39,7 @@ protected:
   bool mHover{false};
 
 public:
+  bool canIBeClicked{false};
   bool isChanged{false};
 
   //QPointF mStartMovePos;
@@ -51,11 +52,13 @@ public:
     FOOL_PLAYER_SET_VIEW(QPointF pos, int w, int h):MY_ITEM(pos, w, h){
         itIsBeaten = new BUTTON(QPointF(80*6, 0), "beaten");
         itIsBeaten->setParentItem(this);
-        iTake = new BUTTON(QPointF(80*6, 50), "take");
+        iTake = new BUTTON(QPointF(80*6, 39), "take");
         iTake->setParentItem(this);
+        //takeAway = new BUTTON(QPointF(80*6, 78), "take away");
+        //takeAway->setParentItem(this);
     }
 
-    BUTTON *itIsBeaten, *iTake;
+    BUTTON *itIsBeaten, *iTake/*, *takeAway*/;
     //если есть возможность менять очередность добавления карт в набор,
     //то имеет смысл делать map и вызывать updateSet() не так часто
     //std::map<CARD*, CARD_BTN*> my_map;

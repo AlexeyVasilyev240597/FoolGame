@@ -18,6 +18,7 @@ private:
     SUIT trump;
 
     FOOL_FIGHT_FIELD *field{NULL};
+
     bool my_move{false};
 
     void sortSet();
@@ -31,7 +32,7 @@ public:
 
     CARD *changed_card{NULL};
 
-    enum PLAYER_STATE{ATTACK, DEFENCE, NO_DEF} state{NO_DEF};
+    enum PLAYER_STATE{ATTACK, DEFENCE, /*TAKING,*/ NO_DEF} state{NO_DEF};
 
     //пока не написана getMinTrump(), первым ходит первый игрок
     FOOL_PLAYER(size_t iv) : ELEMENT(TO_HOLDER, iv){}
@@ -50,10 +51,13 @@ public:
 
     void changeState();
 
+    void customizeButtons();
+
     //void drawSet();
 
 public slots:
     void changeCard(Qt::MouseButton);
+    void changeMoveValue();
 };
 
 #endif // PLAYER_H

@@ -87,16 +87,29 @@ void FOOL_PLAYER::showMinTrump(){
 
 }
 
+
+void FOOL_PLAYER::customizeButtons(){
+    for (size_t i = 0; i < pl_set_view->card_btns.size(); i++)
+        pl_set_view->card_btns[i]->canIBeClicked = my_move;
+
+    pl_set_view->iTake->setVisible(my_move && state == DEFENCE);
+    pl_set_view->itIsBeaten->setVisible(my_move && state == ATTACK);
+}
+
 void FOOL_PLAYER::initState(PLAYER_STATE s){
     state = s;
-    pl_set_view->iTake->setVisible(state == DEFENCE);
-    pl_set_view->itIsBeaten->setVisible(state == ATTACK);
+    my_move = state == ATTACK;
+    customizeButtons();
 }
 
 void FOOL_PLAYER::changeState(){
     state = state == ATTACK ? DEFENCE : ATTACK;
-    pl_set_view->iTake->setVisible(state == DEFENCE);
-    pl_set_view->itIsBeaten->setVisible(state == ATTACK);
+    customizeButtons();
+}
+
+void FOOL_PLAYER::changeMoveValue(){
+    my_move = !my_move;
+    customizeButtons();
 }
 /*
 For advanced users, there are ways to alter how your items are sorted:
