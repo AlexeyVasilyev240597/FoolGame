@@ -13,13 +13,11 @@
 #include "../abstract/CardDeck.h"
 #include "../abstract/MyItem.h"
 
+//-----------------------------CARD_BUTTON-----------------------------
 class CARD_BTN : public QObject, public CARD_ITEM{
 Q_OBJECT
 public:
-  //для карт FACE == DOWN другой конструктор!
-  CARD_BTN(QPointF pos, CARD* c): CARD_ITEM(pos, c){ setAcceptHoverEvents(true); }
-
-  //QRectF boundingRect() const override;
+  CARD_BTN(QPointF pos, CARD* c): CARD_ITEM(pos, c){setAcceptHoverEvents(true);}
 
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
@@ -32,12 +30,8 @@ public:
   void hoverEnterEvent(QGraphicsSceneHoverEvent*)   override;
   void hoverLeaveEvent(QGraphicsSceneHoverEvent*)   override;
 
-  //void setGeometry(int, int);
-
-  //void setImage(QString);
-
 signals:
-  void btnMouseReleaseEvent(Qt::MouseButton);
+  void cardButtonClicked(Qt::MouseButton);
 
 protected:
   //bool mIsMoving{false};
@@ -50,11 +44,18 @@ public:
   //QPointF mStartMovePos;
 };
 
+//-----------------------------PLAYER'S ITEM-----------------------------
 class FOOL_PLAYER_SET_VIEW : public MY_ITEM
 {
 public:
-    FOOL_PLAYER_SET_VIEW(QPointF pos, int w, int h):MY_ITEM(pos, w, h){}
+    FOOL_PLAYER_SET_VIEW(QPointF pos, int w, int h):MY_ITEM(pos, w, h){
+        itIsBeaten = new BUTTON(QPointF(80*6, 0), "beaten");
+        itIsBeaten->setParentItem(this);
+        iTake = new BUTTON(QPointF(80*6, 50), "take");
+        iTake->setParentItem(this);
+    }
 
+    BUTTON *itIsBeaten, *iTake;
     //если есть возможность менять очередность добавления карт в набор,
     //то имеет смысл делать map и вызывать updateSet() не так часто
     //std::map<CARD*, CARD_BTN*> my_map;
@@ -62,12 +63,12 @@ public:
 
 };
 
+//-----------------------------PRICUP'S ITEM-----------------------------
 class FOOL_PRICUP_SET_VIEW : public MY_ITEM
 {
 public:
-    FOOL_PRICUP_SET_VIEW(QPointF pos, int w, int h):MY_ITEM(pos, w, h){
-        QPointF p(0, 0);//378);
-        pileImg = new CARD_ITEM(p);
+    FOOL_PRICUP_SET_VIEW(QPointF pos, int w, int h):MY_ITEM(pos, w, h){        
+        pileImg = new CARD_ITEM(QPointF(0, 0));
     }
 
     CARD_ITEM *pileImg, *trumpImg;
@@ -82,6 +83,7 @@ public:
 
 };
 
+//-----------------------------FIELD'S ITEM-----------------------------
 class FOOL_FIGHT_FIELD_SET_VIEW : public MY_ITEM
 {
 public:
@@ -97,4 +99,16 @@ public:
 
 };
 
+
+//-----------------------------BEATEN'S ITEM-----------------------------
+class FOOL_BEATEN_SET_VIEW: public MY_ITEM
+{
+public:
+    FOOL_BEATEN_SET_VIEW(QPointF pos, int w, int h):MY_ITEM(pos, w, h){
+        pileImg = new CARD_ITEM(QPointF(0, 0));
+    }
+
+    CARD_ITEM *pileImg;
+
+};
 #endif // BUTTON_HPP

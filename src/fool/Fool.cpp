@@ -12,11 +12,9 @@ FOOL_GAME::FOOL_GAME(){
 
     pl1 = new FOOL_PLAYER(PLAYER_VOLUME_INIT);
     pl2 = new FOOL_PLAYER(PLAYER_VOLUME_INIT);    
-    pl1->initSetView(QPointF(240, 495), 80 * PLAYER_VOLUME_INIT, 145/*116*1.25*/);
-    pl2->initSetView(QPointF(240, 0), 80 * PLAYER_VOLUME_INIT, 145);
+    pl1->initSetView(QPointF(240, 495), 80 * PLAYER_VOLUME_INIT + 40/*for buttons*/, 145/*116*1.25*/);
+    pl2->initSetView(QPointF(240, 0), 80 * PLAYER_VOLUME_INIT + 40, 145);
 
-    players.push_back(pl1);
-    players.push_back(pl2);
 
     pr = new FOOL_PRICUP(_36_CARD_DECK - PLAYER_VOLUME_INIT - PLAYER_VOLUME_INIT);
     pr->initSetView(QPointF(0, 262), 116, 116);
@@ -24,18 +22,23 @@ FOOL_GAME::FOOL_GAME(){
     field = new FOOL_FIGHT_FIELD();
     field->initSetView(QPointF(300, 150), 360, 290);
 
-    table.push_back(pr);
-    table.push_back(field);
+    beaten = new FOOL_BEATEN();
+    beaten->initSetView(QPointF(880, 262), 80, 116);
+
 }
 
 
 void FOOL_GAME::game()
 {
     //qDebug() << players.size();
-    dealer->getOutCards(players);
+    dealer->getOutCards(pl1);
+    dealer->getOutCards(pl2);
+    dealer->getOutCards(pr); 
 
-    dealer->getOutCards(table);
     trump = pr->getTrumpSuit();
+
+    pl1->initState(FOOL_PLAYER::ATTACK);
+    pl2->initState(FOOL_PLAYER::DEFENCE);
 
     QObject::connect(pl1, &FOOL_PLAYER::chooseIsMade,
                      this, &FOOL_GAME::someSetUpdated);
@@ -43,8 +46,11 @@ void FOOL_GAME::game()
     QObject::connect(pl2, &FOOL_PLAYER::chooseIsMade,
                      this, &FOOL_GAME::someSetUpdated);
 
-    //QObject::connect(field, &FOOL_FIGHT_FIELD::setUpdated,
-                     //this, &FOOL_GAME::someSetUpdated);
+    QObject::connect(pl1->pl_set_view->itIsBeaten, &BUTTON::buttonClicked,
+                     this, &FOOL_GAME::throwToBeaten);
+
+    QObject::connect(pl2->pl_set_view->itIsBeaten, &BUTTON::buttonClicked,
+                     this, &FOOL_GAME::throwToBeaten);
     //players[0]->drawSet();
     //players[1]->drawSet();
 
@@ -84,4 +90,36 @@ void FOOL_GAME::someSetUpdated(){
         field->addToSet(pl1->giveCard());
         pl1->changed_card = NULL;
     }
+    if (pl2->changed_card != NULL){
+        field->addToSet(pl2->giveCard());
+        pl2->changed_card = NULL;
+    }
+
+}
+
+void FOOL_GAME::throwToBeaten(){
+    beaten->addToSet(field->giveCard());
+
+    //this init of first and last remove to FOOL_RULES::howFirstTakeFromPricup(first, last)
+    FOOL_PLAYER *first = pl1->state == FOOL_PLAYER::ATTACK  ? pl1 : pl2,
+                *last  = pl1->state == FOOL_PLAYER::DEFENCE ? pl1 : pl2;
+    //a define of cards number remove to size_t FOOL_RULES::howMuchCardsToTakeFromPricup()
+    first->addToSet(pr->giveCard(std::min(first->getInitVolume() - first->getVolume(), pr->getVolume())));
+     last->addToSet(pr->giveCard(std::min(last->getInitVolume()  -  last->getVolume(), pr->getVolume())));
+
+   //remove to FOOL_RULES::changeState(pl1)
+   pl1->changeState();
+   pl2->changeState();
+}
+
+std::vector<MY_ITEM*> FOOL_GAME:: getItems(){
+    std::vector<MY_ITEM*> items;
+
+    items.push_back(pl1->pl_set_view);
+    items.push_back(pl2->pl_set_view);
+    items.push_back(pr->pr_set_view);
+    items.push_back(field->f_f_set_view);
+    items.push_back(beaten->b_set_view);
+
+    return items;
 }

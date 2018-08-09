@@ -53,7 +53,7 @@ void FOOL_PLAYER::itemsUpdate(){
 
     for (size_t i = 0; i < pl_set_view->card_btns.size(); i++){
         pl_set_view->card_btns[i]->setParentItem(pl_set_view);
-        QObject::connect(pl_set_view->card_btns[i], &CARD_BTN::btnMouseReleaseEvent,
+        QObject::connect(pl_set_view->card_btns[i], &CARD_BTN::cardButtonClicked,
                          this, &FOOL_PLAYER::changeCard);
     }
 }
@@ -64,7 +64,7 @@ void FOOL_PLAYER::changeCard(Qt::MouseButton){
             changed_card = my_set[i];
             break;
         }
-    qDebug() << changed_card->getSuit() << changed_card->getRank();
+    //qDebug() << changed_card->getSuit() << changed_card->getRank();
     emit chooseIsMade();
 }
 
@@ -79,15 +79,40 @@ void FOOL_PLAYER::fillCardBtns(){
 
 void FOOL_PLAYER::initSetView(QPointF pos, int w, int h){
     pl_set_view = new FOOL_PLAYER_SET_VIEW(pos, w, h);
-    set_view = pl_set_view;
-    //if (!my_set.empty())
-      //  fillCardBtns();
+    //pl_set_view->itIsBeaten->setGeometry(QRect(QPoint(80*6,  0), QSize(30, 30)));
+    //pl_set_view->itIsBeaten->setGeometry(QRect(QPoint(80*6, 40), QSize(30, 30)));
 }
 
 void FOOL_PLAYER::showMinTrump(){
 
 }
 
+void FOOL_PLAYER::initState(PLAYER_STATE s){
+    state = s;
+    pl_set_view->iTake->setVisible(state == DEFENCE);
+    pl_set_view->itIsBeaten->setVisible(state == ATTACK);
+}
+
+void FOOL_PLAYER::changeState(){
+    state = state == ATTACK ? DEFENCE : ATTACK;
+    pl_set_view->iTake->setVisible(state == DEFENCE);
+    pl_set_view->itIsBeaten->setVisible(state == ATTACK);
+}
+/*
+For advanced users, there are ways to alter how your items are sorted:
+
+You can call setZValue() on an item to explicitly stack it on top of,
+or under, other sibling items. The default Z value for an item is 0.
+Items with the same Z value are stacked by insertion order.
+
+You can call stackBefore() to reorder the list of children.
+This will directly modify the insertion order.
+
+You can set the ItemStacksBehindParent flag to stack a child item behind its parent.
+The stacking order of two sibling items also counts for each item's children
+and descendant items. So if one item is on top of another, then all its children
+will also be on top of all the other item's children as well.
+*/
 void FOOL_PLAYER::sortSet(){
     for (size_t i = 0; i < my_set.size() - 1; i++)
         for (size_t j = i + 1; j < my_set.size(); j++){

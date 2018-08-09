@@ -20,7 +20,6 @@ private:
     FOOL_FIGHT_FIELD *field{NULL};
     bool my_move{false};
 
-    FOOL_PLAYER_SET_VIEW *pl_set_view;
     void sortSet();
 
     void itemsUpdate();
@@ -28,12 +27,17 @@ signals:
     void chooseIsMade();
 
 public:
+    FOOL_PLAYER_SET_VIEW *pl_set_view;    
+
     CARD *changed_card{NULL};
-    enum PLAYER_STATE{NO_DEF, ATTACK, DEFENCE} state{NO_DEF};
+
+    enum PLAYER_STATE{ATTACK, DEFENCE, NO_DEF} state{NO_DEF};
+
     //пока не написана getMinTrump(), первым ходит первый игрок
     FOOL_PLAYER(size_t iv) : ELEMENT(TO_HOLDER, iv){}
 
     std::vector<CARD*> giveCard();
+
     void setTrump(SUIT tr){ trump = tr; }
 
     void showMinTrump();
@@ -41,6 +45,10 @@ public:
     void initSetView(QPointF, int, int);
 
     void addToSet(std::vector<CARD*> cards);
+
+    void initState(PLAYER_STATE s);
+
+    void changeState();
 
     //void drawSet();
 

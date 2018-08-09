@@ -15,12 +15,12 @@ class SCENE_VIEW : public QGraphicsView
 {
 public:
   SCENE_VIEW();
-  void setGame(FOOL_GAME *g);
+  void setItems(std::vector<MY_ITEM*> items);
 //public slots:
     //void addItem(MY_ITEM* item);
 
 private:
-  FOOL_GAME *game;
+  //FOOL_GAME *game;
   QGraphicsScene mScene;
   //std::vector<MY_ITEM*> my_items;
 

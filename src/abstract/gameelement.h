@@ -19,8 +19,7 @@ protected:
 public:
     ELEMENT(ACCESS ac, size_t iv){
         access = ac;
-        init_volume = iv;
-        set_view = NULL;
+        init_volume = iv;     
     }
 
     ACCESS getAccess(){ return access; }
@@ -40,20 +39,16 @@ public:
     //later it method will be private, access
     virtual void addToSet(std::vector<CARD*> cards){
         for (size_t i = 0; i < cards.size(); i++){
-            my_set.push_back(cards[i]);
-            //в перегрузке для player по-другому
+            my_set.push_back(cards[i]);        
             my_set.back()->changeFaceState(access != TO_NOONE ? UP : DOWN);
         }
     }
 
     virtual std::vector<CARD*> giveCard() = 0;
 
-    MY_ITEM *set_view;
-
-    //virtual void initSetView(QPoint pos, int w, int h) = 0   - потом сделай, когда для всех наслеников напишешь
     virtual void initSetView(QPointF, int, int){}
 
-    virtual void drawSet(){}
+    //virtual void drawSet(){}
 };
 
 #endif // _GAME_ELEMENT_H

@@ -47,13 +47,9 @@ void SCENE_VIEW::initGameScene(){
    qWarning() << "i am in initGameScene";
 }
 */
-void SCENE_VIEW::setGame(FOOL_GAME *g){
-    //qDebug() << "i set game";
-    game = g;
-    mScene.addItem(game->players[0]->set_view);
-    mScene.addItem(game->players[1]->set_view);
-    mScene.addItem(game->table[0]->set_view);
-    mScene.addItem(game->table[1]->set_view);
+void SCENE_VIEW::setItems(std::vector<MY_ITEM*> items){
+    for(size_t i = 0; i < items.size(); i++)
+        mScene.addItem(items[i]);
 }
 /*
 //------------------------------------------------------------------------------

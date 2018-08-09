@@ -38,11 +38,17 @@ public:
 };
 
 
-class FOOL_BEATEN_OFF : public ELEMENT{
+class FOOL_BEATEN : public ELEMENT{
 public:
-	FOOL_BEATEN_OFF():ELEMENT(TO_NOONE, 0){}
+    FOOL_BEATEN():ELEMENT(TO_NOONE, 0){}
+
+    FOOL_BEATEN_SET_VIEW *b_set_view;
 
     std::vector<CARD*> giveCard();
+
+    void initSetView(QPointF pos, int w, int h);
+
+    void addToSet(std::vector<CARD*> cards);
 };
 
 
@@ -80,7 +86,7 @@ public:
     //players.reserve(num_of_players);
     }
 
-    void getOutCards(std::vector<ELEMENT*> &elems);
+    void getOutCards(ELEMENT* elem);
 
     void exchange(ELEMENT* from, ELEMENT* to);
 };

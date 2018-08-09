@@ -11,12 +11,9 @@ int main(int argc, char *argv[])
   QApplication a(argc, argv);
 
   SCENE_VIEW game_scene;
-  FOOL_GAME *fool = new FOOL_GAME();
-  game_scene.setGame(fool);
-  fool->game();
-  //QList<QGraphicsItem*> l = game_scene.items();
-  //qDebug() << l.size();
-  //QGraphicsItem* i = l.back();
+  FOOL_GAME fool;
+  game_scene.setItems(fool.getItems());
+  fool.game();
   game_scene.show();
 
   return a.exec();

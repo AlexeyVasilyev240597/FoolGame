@@ -1,14 +1,15 @@
 #ifndef _MY_ITEM_H
 #define _MY_ITEM_H
 
-//#include <QObject>
+#include <QObject>
 #include <QGraphicsItem>
+#include <QString>
+#include <QPointF>
+#include <QPixmap>
+#include <QPainter>
+#include <QGraphicsSceneMouseEvent>
+#include <QApplication>
 #include "CardDeck.h"
-//#include <QPointF>
-//#include <QPixmap>
-//#include <QPainter>
-//#include <QGraphicsSceneMouseEvent>
-//#include <QApplication>
 
 class MY_ITEM : /*public QObject, */public QGraphicsItem
 {
@@ -40,7 +41,6 @@ public:
             path += QString::number((int)c->getRank());
             path += ".png";
         }
-        //qDebug() << path;
         setImage(path);
     }
 
@@ -54,5 +54,28 @@ protected:
         mHeigth = mPixMap.height();
     }
 };
+
+class BUTTON : public QObject, public MY_ITEM{
+Q_OBJECT
+public:
+    //size?!
+  BUTTON(QPointF pos, const QString text):MY_ITEM(pos, 40, 40){
+      my_text = text;
+      setAcceptedMouseButtons(Qt::LeftButton);
+  }
+
+  void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
+  void mousePressEvent(QGraphicsSceneMouseEvent *)  override;
+  void mouseReleaseEvent(QGraphicsSceneMouseEvent *)override;
+
+signals:
+  void buttonClicked(Qt::MouseButton);
+
+private:
+  QString my_text;
+
+};
+
 
 #endif // _MY_ITEM_H
