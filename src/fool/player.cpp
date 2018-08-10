@@ -1,7 +1,18 @@
 #include <QObject>
 #include "Player.h"
 
-void FOOL_PLAYER::addToSet(std::vector<CARD*> cards){
+QPointF FOOL_PLAYER::getMyPos(size_t index){
+    qreal x = my_set.size() <= init_volume ?
+                80 * (3 - (qreal)my_set.size() / 2 + index) :     //выравнивание по центру
+         (qreal)80 * 5 * index / (my_set.size() - 1),             //уплотнение набора
+          y = 29 * (my_set.size() >= 36 / 2);                      //второй ряд карт
+
+    QPoint p(x, y);
+    return p;
+}
+
+void FOOL_PLAYER::addToSet(std::vector<CARD*> cards)
+{
     for (size_t i = 0; i < cards.size(); i++){
         my_set.push_back(cards[i]);
         //в перегрузке для player по-другому
@@ -9,7 +20,27 @@ void FOOL_PLAYER::addToSet(std::vector<CARD*> cards){
     }
 
     //sortSet();
-    itemsUpdate();
+    //itemsUpdate();
+    //qDebug() << state;
+    for (size_t i = 0; i < my_set.size(); i++){
+
+        //if my_set[i] is not found
+        if (pl_set_view->card_btns.find(my_set[i]) ==
+                pl_set_view->card_btns.end()){
+
+            CARD_BTN* c_b = new CARD_BTN(getMyPos(i), my_set[i]);
+            pl_set_view->card_btns.insert(std::pair<CARD*, CARD_BTN*>(my_set[i], c_b));
+
+            pl_set_view->card_btns.at(my_set[i])->setParentItem(pl_set_view);
+            QObject::connect(pl_set_view->card_btns.at(my_set[i]), &CARD_BTN::cardButtonClicked,
+                             this, &FOOL_PLAYER::changeCard);
+        }
+        else
+            pl_set_view->card_btns.at(my_set[i])->setPos(getMyPos(i));
+
+        pl_set_view->card_btns.at(my_set[i])->setZValue(i + 1);
+        //qDebug() << my_set[i]->getRank() << my_set[i]->getSuit();
+    }
 
     //emit setUpdated();
 }
@@ -25,14 +56,21 @@ std::vector<CARD*> FOOL_PLAYER::giveCard(){
             break;
         }
 
+    delete pl_set_view->card_btns.at(changed_card);
+    pl_set_view->card_btns.erase(changed_card);
 
-    itemsUpdate();
+    size_t index = 0;
+    for (std::map<CARD*, CARD_BTN*>::iterator it = pl_set_view->card_btns.begin();
+         it != pl_set_view->card_btns.end();
+         it++, index++){
 
-    //emit setUpdated();
+        it->second->setPos(getMyPos(index));
+        it->second->setZValue(index + 1);
+     }
 
     return cards;
 }
-
+/*
 void FOOL_PLAYER::itemsUpdate(){
     if (!pl_set_view->card_btns.empty()){
 
@@ -57,11 +95,11 @@ void FOOL_PLAYER::itemsUpdate(){
                          this, &FOOL_PLAYER::changeCard);
     }
 }
-
+*/
 void FOOL_PLAYER::changeCard(Qt::MouseButton){
-    for (size_t i = 0; i < pl_set_view->card_btns.size(); i++)
-        if (pl_set_view->card_btns[i]->isChanged){
-            changed_card = my_set[i];
+    for (std::map<CARD*, CARD_BTN*>::iterator it = pl_set_view->card_btns.begin(); it != pl_set_view->card_btns.end(); it++)
+        if (it->second->isChanged){
+            changed_card = it->first;
             break;
         }
     //qDebug() << changed_card->getSuit() << changed_card->getRank();
@@ -89,11 +127,12 @@ void FOOL_PLAYER::showMinTrump(){
 
 
 void FOOL_PLAYER::customizeButtons(){
-    for (size_t i = 0; i < pl_set_view->card_btns.size(); i++)
-        pl_set_view->card_btns[i]->canIBeClicked = my_move;
+    for (std::map<CARD*, CARD_BTN*>::iterator it = pl_set_view->card_btns.begin(); it != pl_set_view->card_btns.end(); it++)
+        it->second->canIBeClicked = my_move;
 
     pl_set_view->iTake->setVisible(my_move && state == DEFENCE);
     pl_set_view->itIsBeaten->setVisible(my_move && state == ATTACK);
+    pl_set_view->takeAway->setVisible(state == ADDING);
 }
 
 void FOOL_PLAYER::initState(PLAYER_STATE s){
@@ -103,7 +142,25 @@ void FOOL_PLAYER::initState(PLAYER_STATE s){
 }
 
 void FOOL_PLAYER::changeState(){
-    state = state == ATTACK ? DEFENCE : ATTACK;
+    //=== state = state == ATTACK || state == TAKING ? DEFENCE : ATTACK;
+    switch (state){
+    case ATTACK:
+        state = DEFENCE;
+        break;
+    case DEFENCE:
+        state = ATTACK;
+        break;
+    case ADDING:
+        state = ATTACK;
+        break;
+    case TAKING:
+        state = DEFENCE;
+        break;
+    case NO_DEF:
+        state = NO_DEF;
+        break;
+    }
+
     customizeButtons();
 }
 

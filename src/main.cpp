@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
   FOOL_GAME fool;
   game_scene.setItems(fool.getItems());
   fool.game();
-  game_scene.show();
+  game_scene.show();  
 
   return a.exec();
 }

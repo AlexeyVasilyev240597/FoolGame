@@ -52,17 +52,20 @@ public:
     FOOL_PLAYER_SET_VIEW(QPointF pos, int w, int h):MY_ITEM(pos, w, h){
         itIsBeaten = new BUTTON(QPointF(80*6, 0), "beaten");
         itIsBeaten->setParentItem(this);
+
         iTake = new BUTTON(QPointF(80*6, 39), "take");
         iTake->setParentItem(this);
-        //takeAway = new BUTTON(QPointF(80*6, 78), "take away");
-        //takeAway->setParentItem(this);
+
+        takeAway = new BUTTON(QPointF(80*6, 78), "take\n away");
+        takeAway->setParentItem(this);
     }
 
-    BUTTON *itIsBeaten, *iTake/*, *takeAway*/;
+    BUTTON *itIsBeaten, *iTake, *takeAway;
     //если есть возможность менять очередность добавления карт в набор,
     //то имеет смысл делать map и вызывать updateSet() не так часто
-    //std::map<CARD*, CARD_BTN*> my_map;
-    std::vector<CARD_BTN*> card_btns;
+    std::map<CARD*, CARD_BTN*> card_btns;
+    //std::vector<CARD_BTN*> card_btns;
+
 
 };
 
@@ -75,15 +78,6 @@ public:
     }
 
     CARD_ITEM *pileImg, *trumpImg;
-
-    //std::map<CARD*, CARD_BTN*> my_map;
-    //std::vector<CARD_BTN*> card_btns;
-//public slots:
-    //void setUpdate(std::vector<CARD*>);
-
-//private:
-    //void drawSetView();
-
 };
 
 //-----------------------------FIELD'S ITEM-----------------------------

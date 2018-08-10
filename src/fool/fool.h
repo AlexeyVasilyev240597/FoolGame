@@ -20,7 +20,9 @@ protected:
     FOOL_FIGHT_FIELD *field;
     FOOL_BEATEN *beaten;
 
+    enum END_LOCAL_STATE{ NOT_END, GIVE_AWAY, BEATEN_OFF };
     void fillSetsOfPlayers();
+    END_LOCAL_STATE isEndLocal();
 
 signals:
     void transferMove();
@@ -40,10 +42,11 @@ public:
     FOOL_GAME();
     void game();
     std::vector<MY_ITEM*> getItems();
+    void endLocalFight();
 
 public slots:
     void playerChoosedCard();
-    //void finishHim();
+    void finishHim();
     void throwToBeaten();
     void giveToPlayer();
 /*

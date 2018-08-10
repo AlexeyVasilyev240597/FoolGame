@@ -8,7 +8,7 @@
 #include "../abstract/CardDeck.h"
 #include "../abstract/GameElement.h"
 #include "../drawing/GameItems.h"
-#include "Table.h"
+//#include "Table.h"
 
 class FOOL_PLAYER :public QObject, public ELEMENT{
 Q_OBJECT
@@ -17,22 +17,24 @@ private:
     bool is_user{false};
     SUIT trump;
 
-    FOOL_FIGHT_FIELD *field{NULL};
-
-    bool my_move{false};
+    //FOOL_FIGHT_FIELD *field{NULL};
 
     void sortSet();
+
+    QPointF getMyPos(size_t index);
 
     void itemsUpdate();
 signals:
     void chooseIsMade();
 
 public:
+    bool my_move{false};
+
     FOOL_PLAYER_SET_VIEW *pl_set_view;    
 
     CARD *changed_card{NULL};
 
-    enum PLAYER_STATE{ATTACK, DEFENCE, /*TAKING,*/ NO_DEF} state{NO_DEF};
+    enum PLAYER_STATE{ATTACK, DEFENCE, ADDING, TAKING, NO_DEF} state{NO_DEF};
 
     //пока не написана getMinTrump(), первым ходит первый игрок
     FOOL_PLAYER(size_t iv) : ELEMENT(TO_HOLDER, iv){}

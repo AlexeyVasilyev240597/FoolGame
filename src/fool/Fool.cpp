@@ -7,13 +7,11 @@
 //later be in RULES
 #define PLAYER_VOLUME_INIT 6
 
-void FOOL_RULES::fillSetsOfPlayers(){
+void FOOL_RULES::fillSetsOfPlayers()
+{
+    FOOL_PLAYER *first = pl1->state == FOOL_PLAYER::ATTACK || pl1->state == FOOL_PLAYER::ADDING ? pl1 : pl2,
+                *last  = pl1->state == FOOL_PLAYER::DEFENCE|| pl1->state == FOOL_PLAYER::TAKING ? pl1 : pl2;
 
-    //this init of first and last should be removed to FOOL_RULES::howFirstTakeFromPricup(first, last)
-    FOOL_PLAYER *first = pl1->state == FOOL_PLAYER::ATTACK  ? pl1 : pl2,
-                *last  = pl1->state == FOOL_PLAYER::DEFENCE ? pl1 : pl2;
-
-    //a define of cards number should be removed to size_t FOOL_RULES::howMuchCardsToTakeFromPricup()
     if (pr->getVolume())
         if (first->getVolume() < first->getInitVolume())
             first->addToSet(
@@ -30,6 +28,7 @@ void FOOL_RULES::fillSetsOfPlayers(){
                                 last->getInitVolume()  -  last->getVolume(),
                                 pr->getVolume())));
 
+   //is it game over?
    if (pl1->getVolume() == 0 && pl2->getVolume() == 0)
        qDebug() << "game  over: dead heat";
    if (pl1->getVolume() == 0)
@@ -47,7 +46,7 @@ FOOL_GAME::FOOL_GAME(){
     pl2->initSetView(QPointF(240, 0), 80 * PLAYER_VOLUME_INIT + 40, 145);
 
 
-    pr = new FOOL_PRICUP(_36_CARD_DECK - PLAYER_VOLUME_INIT - PLAYER_VOLUME_INIT);
+    pr = new FOOL_PRICUP(4/*_36_CARD_DECK - PLAYER_VOLUME_INIT - PLAYER_VOLUME_INIT*/);
     pr->initSetView(QPointF(0, 262), 116, 116);
 
     field = new FOOL_FIGHT_FIELD();
@@ -58,10 +57,33 @@ FOOL_GAME::FOOL_GAME(){
 
 }
 
+FOOL_RULES::END_LOCAL_STATE FOOL_RULES::isEndLocal(){
+    FOOL_PLAYER *active =  pl1->my_move ? pl1 : pl2,
+               *passive = !pl1->my_move ? pl1 : pl2;
+
+    //if (active->state == FOOL_PLAYER::ATTACK &&
+    //    active->getVolume() == 0 &&
+    //    pr->getVolume() == 0)
+    //gameOver();
+
+    if (active->state == FOOL_PLAYER::ADDING &&
+       (field->card_count_from_attacking - field->card_count_from_defencing) == passive->getVolume())
+        return GIVE_AWAY;
+
+    if (active->state == FOOL_PLAYER::TAKING &&
+       (field->card_count_from_attacking - field->card_count_from_defencing) == active->getVolume())
+        return GIVE_AWAY;
+
+    if (active->state == FOOL_PLAYER::DEFENCE &&
+              (field->getVolume() == active->getInitVolume() * 2 ||
+               active->getVolume() == 0 || passive->getVolume() == 0))
+           return BEATEN_OFF;
+
+    return NOT_END;
+}
 
 void FOOL_GAME::game()
 {
-    //qDebug() << players.size();
     dealer->getOutCards(pl1);
     dealer->getOutCards(pl2);
     dealer->getOutCards(pr); 
@@ -72,8 +94,8 @@ void FOOL_GAME::game()
     pl2->initState(FOOL_PLAYER::DEFENCE);
 
     //на игровом поле 6 пар карт => бросаем их в биту
-    QObject::connect(field, &FOOL_FIGHT_FIELD::iFilled,
-                     this, &FOOL_GAME::throwToBeaten);
+    //QObject::connect(field, &FOOL_FIGHT_FIELD::iFilled,
+      //               this, &FOOL_GAME::throwToBeaten);
     //перешел ход
     QObject::connect(this, &FOOL_GAME::transferMove,
                      pl1, &FOOL_PLAYER::changeMoveValue);
@@ -95,18 +117,10 @@ void FOOL_GAME::game()
     QObject::connect(pl2->pl_set_view->itIsBeaten, &BUTTON::buttonClicked,
                      this, &FOOL_GAME::throwToBeaten);
 
-    //игрок сказал "беру" =>
-    QObject::connect(pl1->pl_set_view->iTake, &BUTTON::buttonClicked,
-                     this, &FOOL_GAME::giveToPlayer);
-    //игрок сказал "беру" =>
-    QObject::connect(pl2->pl_set_view->iTake, &BUTTON::buttonClicked,
-                     this, &FOOL_GAME::giveToPlayer);
-
-/*
-    //игрок сказал "беру" =>
+    //игрок сказал "беру" => даем возможность атакующему "прикончить" противника
     QObject::connect(pl1->pl_set_view->iTake, &BUTTON::buttonClicked,
                      this, &FOOL_GAME::finishHim);
-    //игрок сказал "беру" =>
+    //игрок сказал "беру" => даем возможность атакующему "прикончить" противника
     QObject::connect(pl2->pl_set_view->iTake, &BUTTON::buttonClicked,
                      this, &FOOL_GAME::finishHim);
 
@@ -116,7 +130,7 @@ void FOOL_GAME::game()
     //игрок сказал "забирай" => отдаем карты берущему
     QObject::connect(pl2->pl_set_view->takeAway, &BUTTON::buttonClicked,
                      this, &FOOL_GAME::giveToPlayer);
-*/
+/*
     //players[0]->drawSet();
     //players[1]->drawSet();
 
@@ -132,7 +146,7 @@ void FOOL_GAME::game()
     //player_1->changeFightState(ATTACK);
     //player_1->changeFightState(DEFENSE);
     //trump = pr->getTrumpSuit();
-    /*
+
     ---later:
         dealer->connect(player_1, f_f);
         if (player_2->getDecision() == PICK_UP)
@@ -152,50 +166,63 @@ void FOOL_GAME::game()
 }
 
 void FOOL_GAME::playerChoosedCard(){
-    if (pl1->changed_card != NULL){
-        field->addToSet(pl1->giveCard());
-        pl1->changed_card = NULL;
-        emit transferMove();
-    }
+    FOOL_PLAYER *active = pl1->my_move ? pl1 : pl2;
 
-    if (pl2->changed_card != NULL){
-        field->addToSet(pl2->giveCard());
-        pl2->changed_card = NULL;
-        emit transferMove();
+    field->addToSet(active->giveCard(), active->state);
+    active->changed_card = NULL;
+
+    switch (isEndLocal()){
+    case GIVE_AWAY:
+        giveToPlayer();
+        break;
+
+    case BEATEN_OFF:
+        throwToBeaten();
+        break;
+
+    default://case NOT_END:
+        if (active->state != FOOL_PLAYER::ADDING)
+            emit transferMove();
+        break;
     }
 }
-/*
+
 void FOOL_GAME::finishHim(){
     FOOL_PLAYER *domina = pl1->state == FOOL_PLAYER::ATTACK  ? pl1 : pl2,
             *submission = pl1->state == FOOL_PLAYER::DEFENCE ? pl1 : pl2;
 
     submission->state = FOOL_PLAYER::TAKING;
-    domina->my_move = true;
+    domina->state = FOOL_PLAYER::ADDING;
 
+    emit transferMove();
+
+    if (isEndLocal() == GIVE_AWAY)
+        giveToPlayer();
 }
-*/
+
 void FOOL_GAME::throwToBeaten(){
     if (field->getVolume()){
-        pl1->changeState();
-        pl2->changeState();
-
         beaten->addToSet(field->giveCard());
 
-        fillSetsOfPlayers();
+        endLocalFight();
         emit transferMove();
-
     }
 }
 
 void FOOL_GAME::giveToPlayer(){
-    FOOL_PLAYER *recipient = pl1->state == FOOL_PLAYER::DEFENCE ? pl1 : pl2;
-                //*sender = pl1->state == FOOL_PLAYER::ATTACK ? pl1 : pl2;
-
+    FOOL_PLAYER *recipient = pl1->state == FOOL_PLAYER::DEFENCE ||
+                             pl1->state == FOOL_PLAYER::TAKING ? pl1 : pl2;
 
     recipient->addToSet(field->giveCard());
 
+    endLocalFight();
+    //emit transferMove();
+}
+
+void FOOL_GAME::endLocalFight(){
     fillSetsOfPlayers();
-    emit transferMove();
+    pl1->changeState();
+    pl2->changeState();
 }
 
 std::vector<MY_ITEM*> FOOL_GAME:: getItems(){

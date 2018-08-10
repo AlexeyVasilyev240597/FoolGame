@@ -10,6 +10,7 @@
 #include "../abstract/myitem.h"
 #include "../drawing/GameItems.h"
 #include "../abstract/GameElement.h"
+#include "Player.h"
 #include <QDebug>
 
 class FOOL_PRICUP : public ELEMENT{
@@ -57,21 +58,24 @@ Q_OBJECT
 public:
     FOOL_FIGHT_FIELD_SET_VIEW *f_f_set_view;
 
-    enum FIELD_STATE{PLAYING, BEATEN_OFF, PICK_UP} state;
+    size_t card_count_from_attacking{0},
+           card_count_from_defencing{0};
 
-    FOOL_FIGHT_FIELD() :ELEMENT(TO_ALL, 0){ state = PLAYING; }
+    //enum FIELD_STATE{PLAYING, BEATEN_OFF, PICK_UP} state{PLAYING};
+
+    FOOL_FIGHT_FIELD() :ELEMENT(TO_ALL, 0){}
 
     std::vector<CARD*> giveCard();
 
     void initSetView(QPointF pos, int w, int h);
 
-    void addToSet(std::vector<CARD*> cards);
+    void addToSet(std::vector<CARD*> cards, FOOL_PLAYER::PLAYER_STATE s);
 
     //void itemsUpdate();
 
 signals:
     void setUpdated();
-    void iFilled();
+    //void iFilled();
 };
 
 

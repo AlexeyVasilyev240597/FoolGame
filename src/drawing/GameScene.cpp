@@ -48,8 +48,10 @@ void SCENE_VIEW::initGameScene(){
 }
 */
 void SCENE_VIEW::setItems(std::vector<MY_ITEM*> items){
-    for(size_t i = 0; i < items.size(); i++)
+    for(size_t i = 0; i < items.size(); i++){
         mScene.addItem(items[i]);
+        //qDebug() << items[i]->zValue();
+    }
 }
 /*
 //------------------------------------------------------------------------------

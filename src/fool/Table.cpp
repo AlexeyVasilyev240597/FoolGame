@@ -8,16 +8,19 @@ std::vector<CARD*> FOOL_PRICUP::giveCard(size_t number){
 	//return cards;
 	//else cards.reserve(number);
 
+    bool have_last_close_card = my_set.size() >= 2;
+
 	for (size_t i = 0; i < number; i++){
 		cards.push_back(my_set.at(0));
 		my_set.erase(my_set.begin());
 	}
 
-    if (my_set.size() <= 1)
+    if (have_last_close_card && my_set.size() <= 1)
         delete pr_set_view->pileImg;
 
     if (my_set.empty())
         delete pr_set_view->trumpImg;
+
     qDebug() << "in Pricup " << this->getVolume() <<"cards";
 
 	return cards;
@@ -74,24 +77,36 @@ void FOOL_BEATEN::initSetView(QPointF pos, int w, int h){
 }
 
 //-----------------------------FIELD-----------------------------
-void FOOL_FIGHT_FIELD::addToSet(std::vector<CARD*> cards){
-    for (size_t i = 0; i < cards.size(); i++){
-       my_set.push_back(cards[i]);
-       my_set.back()->changeFaceState(UP);
-       size_t index = my_set.size()-1;
-       double x = 80 / 2 * (index % 6 % 2) + 80 * 1.5 * (index % 6 / 2),
-              y = 116 * 1.25 * (index > 5) + 116 * 0.25 * (index % 2);
+void FOOL_FIGHT_FIELD::addToSet(std::vector<CARD*> cards, FOOL_PLAYER::PLAYER_STATE s){
+    my_set.push_back(cards[0]);
+    my_set.back()->changeFaceState(UP);
+    //size_t index = my_set.size()-1;
+    qreal x(0), y(0);
+
+    if (s == FOOL_PLAYER::ATTACK || s == FOOL_PLAYER::ADDING){
+        card_count_from_attacking++;
+        x = 80 * 1.5 * ((card_count_from_attacking - 1) % 3);
+        y = 116 * 1.25 * (card_count_from_attacking > 3);
+    }
+
+    if (s == FOOL_PLAYER::DEFENCE || s == FOOL_PLAYER::TAKING){
+        card_count_from_defencing++;
+        x = 80 / 2 + 80 * 1.5 * ((card_count_from_defencing-1) % 3);
+        y = 116 * 0.25 + 116 * 1.25 * (card_count_from_defencing > 3);
+    }
+
+    //for (size_t i = 0; i < cards.size(); i++){
+//       double x = 80 / 2 * (index % 6 % 2) + 80 * 1.5 * (index % 6 / 2),
+//              y = 116 * 1.25 * (index > 5) + 116 * 0.25 * (index % 2);
 
        CARD_ITEM* c = new CARD_ITEM(QPoint(x, y), my_set.back());
        f_f_set_view->cards_in_fight.push_back(c);
        f_f_set_view->cards_in_fight.back()->setParentItem(f_f_set_view);
 
        //6 * 2 )))
-       if (my_set.size() == 6 * 2)
-        emit iFilled();
-    }
-
-
+       //if (my_set.size() == 6 * 2)
+        //emit iFilled();
+    //}
 
    emit setUpdated();
 }
@@ -105,6 +120,7 @@ std::vector<CARD*> FOOL_FIGHT_FIELD::giveCard(){
     for (size_t i = 0; i < f_f_set_view->cards_in_fight.size(); i++)
         delete f_f_set_view->cards_in_fight[i];
     f_f_set_view->cards_in_fight.clear();
+    card_count_from_attacking = card_count_from_defencing = 0;
 
     emit setUpdated();
 
