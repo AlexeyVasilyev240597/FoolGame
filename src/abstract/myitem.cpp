@@ -43,6 +43,6 @@ void BUTTON::mousePressEvent(QGraphicsSceneMouseEvent *aEvent){}
 
 void BUTTON::mouseReleaseEvent(QGraphicsSceneMouseEvent *apEvent)
 {
-    qDebug() << "buttonClicked";
+    //qDebug() << "buttonClicked";
     emit buttonClicked(apEvent->button());
 }

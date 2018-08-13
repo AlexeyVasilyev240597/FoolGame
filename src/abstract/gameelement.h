@@ -29,11 +29,18 @@ public:
     size_t getVolume(){ return my_set.size(); }
 
     std::vector<CARD*> showSet(){
-        std::vector<CARD*> cards(my_set.size());
-        if (access == TO_ALL)
-            my_set.swap(cards);
+        std::vector<CARD*> cards(my_set);
+        if (access != TO_ALL)
+            cards.clear();
 
         return cards;
+    }
+
+    CARD* showLastCard(){
+        if (access == TO_ALL)
+            return my_set.back();
+        else
+            return NULL;
     }
 
     //later it method will be private, access

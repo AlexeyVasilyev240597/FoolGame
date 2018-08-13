@@ -6,8 +6,8 @@
 #include <vector>
 
 #include "../abstract/MyItem.h"
-#include "../fool/Table.h"
-#include "../fool/Fool.h"
+//#include "../fool/Table.h"
+//#include "../fool/Fool.h"
 #include <vector>
 
 class   FOOL_GAME;

@@ -96,7 +96,7 @@ public:
 
 	void toMix(){
 		//when RELEASE
-		//srand(time(0));
+        srand(time(0));
 		for (size_t i = 0; i < volume; i++)
 			std::swap(cards[i], cards[rand() % volume]);
 	}
@@ -111,8 +111,9 @@ public:
 				CARD c((SUIT)s, (RANK)r);
 				cards.push_back(c);
 			}
-        //toMix();
+        toMix();
 	}
+
 /*
 	void showDeck(){
         for (size_t i = 0; i < cards.size(); i++){

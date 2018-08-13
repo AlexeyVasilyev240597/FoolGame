@@ -39,7 +39,6 @@ protected:
   bool mHover{false};
 
 public:
-  bool canIBeClicked{false};
   bool isChanged{false};
 
   //QPointF mStartMovePos;
@@ -67,6 +66,8 @@ public:
     //std::vector<CARD_BTN*> card_btns;
 
 
+    QPointF getMyPos(size_t index, size_t n);
+
 };
 
 //-----------------------------PRICUP'S ITEM-----------------------------
@@ -88,6 +89,8 @@ public:
 
     //std::map<CARD*, CARD_BTN*> my_map;
     std::vector<CARD_ITEM*> cards_in_fight;
+    QString text;
+    void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;
 //public slots:
     //void setUpdate(std::vector<CARD*>);
 

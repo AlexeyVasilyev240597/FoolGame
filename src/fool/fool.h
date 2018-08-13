@@ -13,6 +13,7 @@ class   FOOL_RULES: public QObject{
 Q_OBJECT
 protected:
     SUIT trump;
+
     FOOL_PLAYER* pl1;
     FOOL_PLAYER* pl2;
 
@@ -21,11 +22,16 @@ protected:
     FOOL_BEATEN *beaten;
 
     enum END_LOCAL_STATE{ NOT_END, GIVE_AWAY, BEATEN_OFF };
-    void fillSetsOfPlayers();
+
     END_LOCAL_STATE isEndLocal();
+
+    void fillSetsOfPlayers();
+
+    bool isCorrectChoose(FOOL_PLAYER*);
 
 signals:
     void transferMove();
+
     void fieldFilled();
     //void endLocalFight();
 
@@ -40,14 +46,19 @@ private:
 
 public: 
     FOOL_GAME();
+    ~FOOL_GAME();
+
     void game();
     std::vector<MY_ITEM*> getItems();
     void endLocalFight();
 
 public slots:
     void playerChoosedCard();
+
     void finishHim();
+
     void throwToBeaten();
+
     void giveToPlayer();
 /*
 signals:

@@ -2,10 +2,64 @@
 #include "../abstract/gameelement.h"
 #include "player.h"
 #include "table.h"
-
+#include <QGraphicsItem>
 
 //later be in RULES
 #define PLAYER_VOLUME_INIT 6
+
+//-----------------------------------------RULES-----------------------------------------
+bool FOOL_RULES::isCorrectChoose(FOOL_PLAYER *player)
+{
+    //FOOL_PLAYER *active =  pl1->my_move ? pl1 : pl2;
+
+    //зашли в функцию не из playerChoosedCard
+    if (!player->choosed_card)
+        return false;
+
+    switch(player->state){
+        case FOOL_PLAYER::ADDING:
+
+        case FOOL_PLAYER::ATTACK:{
+            //атакующий бросил свою первую карту => карта может быть любая
+            if (field->getVolume() == 0)
+                return true;
+
+            //на поле уже есть карты
+            else{
+                std::vector<CARD*> on_field = field->showSet();
+
+                //если карта с таким достоинством есть на поле
+                for (size_t i = 0; i < on_field.size(); i++)
+                    if (on_field[i]->getRank() == player->choosed_card->getRank())
+                        return true;
+
+                return false;
+            }
+        }
+            break;
+
+        case FOOL_PLAYER::DEFENCE:{
+            CARD *battered = field->showLastCard();
+
+            if (battered->getSuit() == trump){
+                if(player->choosed_card->getRank() > battered->getRank())
+                    return true;
+                else
+                    return false;
+            }
+            else if (player->choosed_card->getSuit() == battered->getSuit() &&
+                     player->choosed_card->getRank() > battered->getRank() ||
+                     player->choosed_card->getSuit() == trump)
+                return true;
+            else
+                return false;
+        }
+            break;
+
+        default:
+            return false;
+    }
+}
 
 void FOOL_RULES::fillSetsOfPlayers()
 {
@@ -29,32 +83,23 @@ void FOOL_RULES::fillSetsOfPlayers()
                                 pr->getVolume())));
 
    //is it game over?
-   if (pl1->getVolume() == 0 && pl2->getVolume() == 0)
-       qDebug() << "game  over: dead heat";
-   if (pl1->getVolume() == 0)
-       qDebug() << "game  over: player 1 wins";
-   if (pl2->getVolume() == 0)
-       qDebug() << "game  over: player 2 wins";
-}
+   if (pl1->getVolume() == 0 && pl2->getVolume() == 0){
+       //qDebug() << "game  over: dead heat";
+       field->f_f_set_view->text = "game  over:\n dead heat";
+       field->f_f_set_view->update();
+   }
 
-FOOL_GAME::FOOL_GAME(){
-    dealer = new DEALER(_36_CARD_DECK);
+   if (pl1->getVolume() == 0){
+       //qDebug() << "game  over: player 1 wins";
+       field->f_f_set_view->text = "game  over:\n player 1 wins";
+       field->f_f_set_view->update();
+   }
 
-    pl1 = new FOOL_PLAYER(PLAYER_VOLUME_INIT);
-    pl2 = new FOOL_PLAYER(PLAYER_VOLUME_INIT);    
-    pl1->initSetView(QPointF(240, 495), 80 * PLAYER_VOLUME_INIT + 40/*for buttons*/, 145/*116*1.25*/);
-    pl2->initSetView(QPointF(240, 0), 80 * PLAYER_VOLUME_INIT + 40, 145);
-
-
-    pr = new FOOL_PRICUP(4/*_36_CARD_DECK - PLAYER_VOLUME_INIT - PLAYER_VOLUME_INIT*/);
-    pr->initSetView(QPointF(0, 262), 116, 116);
-
-    field = new FOOL_FIGHT_FIELD();
-    field->initSetView(QPointF(300, 150), 360, 290);
-
-    beaten = new FOOL_BEATEN();
-    beaten->initSetView(QPointF(880, 262), 80, 116);
-
+   if (pl2->getVolume() == 0){
+       //qDebug() << "game  over: player 2 wins";
+       field->f_f_set_view->text ="game  over:\n player 2 wins";
+       field->f_f_set_view->update();
+   }
 }
 
 FOOL_RULES::END_LOCAL_STATE FOOL_RULES::isEndLocal(){
@@ -82,6 +127,42 @@ FOOL_RULES::END_LOCAL_STATE FOOL_RULES::isEndLocal(){
     return NOT_END;
 }
 
+
+//-----------------------------------------GAME-----------------------------------------
+FOOL_GAME::FOOL_GAME(){
+    dealer = new DEALER(_36_CARD_DECK);
+
+    pl1 = new FOOL_PLAYER(PLAYER_VOLUME_INIT);
+    pl2 = new FOOL_PLAYER(PLAYER_VOLUME_INIT);    
+    pl1->initSetView(QPointF(240, 495), 80 * PLAYER_VOLUME_INIT + 40/*for buttons*/, 145/*116*1.25*/);
+    pl2->initSetView(QPointF(240, 0), 80 * PLAYER_VOLUME_INIT + 40, 145);
+
+
+    pr = new FOOL_PRICUP(_36_CARD_DECK - PLAYER_VOLUME_INIT - PLAYER_VOLUME_INIT);
+    pr->initSetView(QPointF(0, 262), 116, 116);
+
+    field = new FOOL_FIGHT_FIELD();
+    field->initSetView(QPointF(300, 150), 360, 290);
+
+    beaten = new FOOL_BEATEN();
+    beaten->initSetView(QPointF(880, 262), 80, 116);
+
+}
+
+FOOL_GAME::~FOOL_GAME(){
+    delete dealer;
+    //delete pl1->pl_set_view;
+    delete pl1;
+    //delete pl2->pl_set_view;
+    delete pl2;
+    //delete pr->pr_set_view;
+    delete pr;
+    //delete field->f_f_set_view;
+    delete field;
+    //delete beaten->b_set_view;
+    delete beaten;
+}
+
 void FOOL_GAME::game()
 {
     dealer->getOutCards(pl1);
@@ -89,6 +170,8 @@ void FOOL_GAME::game()
     dealer->getOutCards(pr); 
 
     trump = pr->getTrumpSuit();
+    //pl1->setTrump(trump);
+    //pl2->setTrump(trump);
 
     pl1->initState(FOOL_PLAYER::ATTACK);
     pl2->initState(FOOL_PLAYER::DEFENCE);
@@ -168,23 +251,30 @@ void FOOL_GAME::game()
 void FOOL_GAME::playerChoosedCard(){
     FOOL_PLAYER *active = pl1->my_move ? pl1 : pl2;
 
-    field->addToSet(active->giveCard(), active->state);
-    active->changed_card = NULL;
+    if (isCorrectChoose(active)){
+        field->addToSet(active->giveCard(), active->state);
 
-    switch (isEndLocal()){
-    case GIVE_AWAY:
-        giveToPlayer();
-        break;
+        switch (isEndLocal()){
+        case GIVE_AWAY:
+            giveToPlayer();
+            break;
 
-    case BEATEN_OFF:
-        throwToBeaten();
-        break;
+        case BEATEN_OFF:
+            throwToBeaten();
+            break;
 
-    default://case NOT_END:
-        if (active->state != FOOL_PLAYER::ADDING)
-            emit transferMove();
-        break;
+        default://case NOT_END:
+            if (active->state != FOOL_PLAYER::ADDING)
+                emit transferMove();
+            break;
+        }
     }
+
+    else
+        active->pl_set_view->card_btns.at(active->choosed_card)->isChanged = false;
+
+    active->choosed_card = NULL;
+
 }
 
 void FOOL_GAME::finishHim(){
