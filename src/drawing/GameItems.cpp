@@ -28,7 +28,7 @@ void CARD_BTN::hoverLeaveEvent(QGraphicsSceneHoverEvent*)
 }
 
 
-void CARD_BTN::mouseReleaseEvent(QGraphicsSceneMouseEvent *apEvent)
+void CARD_BTN::mouseReleaseEvent(QGraphicsSceneMouseEvent */*apEvent*/)
 {
     //isChanged = true;
     emit cardButtonClicked(my_card);
@@ -135,3 +135,68 @@ void FOOL_PLAYER_SET_VIEW::changeCardState(CARD *card){
     qDebug() << "i in fool player set view change card state";
 }
 */
+
+//-----------------------------PRICUP-----------------------------
+void FOOL_PRICUP_SET_VIEW::gaveOut(CARD* last_card){
+    trumpImg = new CARD_ITEM(QPointF(18, 0), last_card);
+    trumpImg->setParentItem(this);
+    trumpImg->setTransformOriginPoint(trumpImg->mWidth/2, trumpImg->mHeigth/2);
+    trumpImg->setRotation(90);
+
+    pileImg = new CARD_ITEM(QPointF(0, 0));
+    pileImg->setParentItem(this);
+}
+
+void FOOL_PRICUP_SET_VIEW::removeFromPile(size_t size){
+    if (size <= 1)
+        pileImg->setVisible(false);
+
+    if (size == 0)
+        trumpImg->setVisible(false);
+}
+
+//-----------------------------BEATEN-----------------------------
+void FOOL_BEATEN_SET_VIEW::firstAdded(){
+    //if (childItems().empty())
+    pileImg = new CARD_ITEM(QPointF(0, 0));
+    pileImg->setParentItem(this);
+}
+
+//-----------------------------FIELD-----------------------------
+QPointF FOOL_FIGHT_FIELD_SET_VIEW::getMyPos(bool inAttack, size_t index){
+    qreal x, y;
+
+    //if (s == FOOL_PLAYER::ATTACK || s == FOOL_PLAYER::ADDING){
+    if (inAttack){
+        //counter[FROM_ATTAKING]++;
+        //size_t index = counter[FROM_ATTAKING];
+        x = 80 * 1.5 * ((index - 1) % 3);
+        y = 116 * 1.25 * (index > 3);
+    }
+
+    //if (s == FOOL_PLAYER::DEFENCE || s == FOOL_PLAYER::TAKING){
+    else{
+        //counter[FROM_DEFENCING]++;
+        //size_t index = counter[FROM_DEFENCING];
+        //card_count_from_defencing++;
+        x = 80 / 2 + 80 * 1.5 * ((index - 1) % 3);
+        y = 116 * 0.25 + 116 * 1.25 * (index > 3);
+    }
+
+    return QPointF(x, y);
+}
+
+void FOOL_FIGHT_FIELD_SET_VIEW::addCardItem(CARD* card, bool inAttack, size_t index){
+
+    CARD_ITEM* c_i = new CARD_ITEM(getMyPos(inAttack, index), card);
+    cards_in_fight.push_back(c_i);
+    cards_in_fight.back()->setParentItem(this);
+}
+
+
+void FOOL_FIGHT_FIELD_SET_VIEW::removeAllItems(){
+    for (size_t i = 0; i < cards_in_fight.size(); i++)
+        delete cards_in_fight[i];
+
+    cards_in_fight.clear();
+}

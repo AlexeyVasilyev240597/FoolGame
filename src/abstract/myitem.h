@@ -20,13 +20,15 @@ public:
 
   void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-//private:
-  //virtual void drawSetView() = 0;
-
   int mWidth{0};
   int mHeigth{0};
 };
 
+/*
+ * в paint() drawPixmap исходя из my_card face:
+ *  UP or TO_US - лицо, DOWN or FROM_US - рубашка;
+ * тогда загружать рубашку в каждую карту
+ */
 class CARD_ITEM :public MY_ITEM{
 public:
     CARD_ITEM(QPointF pos, CARD* c = NULL):MY_ITEM(pos, 0, 0){
@@ -62,7 +64,7 @@ protected:
 class BUTTON : public QObject, public MY_ITEM{
 Q_OBJECT
 public:
-    //size?!
+    //38x38???
   BUTTON(QPointF pos, const QString text):MY_ITEM(pos, 38, 38){
       my_text = text;
       setAcceptedMouseButtons(Qt::LeftButton);
@@ -73,7 +75,6 @@ public:
   void mousePressEvent(QGraphicsSceneMouseEvent *)  override;
   void mouseReleaseEvent(QGraphicsSceneMouseEvent *)override;
 
-  //bool canIBeClicked{false};
 signals:
   void buttonClicked(Qt::MouseButton);
 

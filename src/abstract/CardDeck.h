@@ -1,6 +1,6 @@
 ﻿#define _36_CARD_DECK 36
 #define _52_CARD_DECK 52
-#define _52_CARD_DECK_PLUS_JOCKERS 54
+#define _52_CARD_DECK_PLUS_JOKERS 54
 
 #ifndef _CARD_DESK_H
 #define  _CARD_DESK_H
@@ -25,7 +25,7 @@ enum COLOR{
 
 enum RANK{
 	NO_RANK,
-	JOCKER,
+    JOKER,
 	TWO,
 	THREE,
 	FOUR,
@@ -43,28 +43,29 @@ enum RANK{
 
 enum FACE{
     DOWN,
-    UP
+    UP,
+    TO_US,
+    FROM_US
 };
 
 class CARD{
 private:
 	SUIT suit;
 	RANK rank;
-	FACE face;
+    FACE face{DOWN};
 	
 	CARD(SUIT s, RANK r){
 		suit = s;
 		rank = r;
-        face = DOWN;
 		in_game = false;
 	}
 
 public:
 	bool in_game;
 
-    inline SUIT getSuit(){ return face == UP ? suit : NO_SUIT; }
+    inline SUIT getSuit(){ return face != DOWN ? suit : NO_SUIT; }
 
-    inline RANK getRank(){ return face == UP ? rank : NO_RANK; }
+    inline RANK getRank(){ return face != DOWN ? rank : NO_RANK; }
 
 	void changeFaceState(FACE f){ face = f; }
 
@@ -75,11 +76,11 @@ public:
         if (face == DOWN)
 			return c;
 
-		if (this->suit == DIAMONDS || this->suit == HEARTS)
+        if (suit == DIAMONDS || suit == HEARTS)
 			c = RED;
-		else if (this->suit == CLUBS || this->suit == SPADES)
+        else if (suit == CLUBS || suit == SPADES)
 			c = BLACK;
-		//JOCKER
+        //JOKER
 		//else c = ;
 		return c;
 	}
@@ -105,7 +106,7 @@ public:
 	DECK(int v = _52_CARD_DECK){
 		volume = v;
 		for (int s = DIAMONDS; s <= SPADES; s++)
-			for (int r = ((volume == _52_CARD_DECK || volume == _52_CARD_DECK_PLUS_JOCKERS) ? TWO : SIX);
+            for (int r = ((volume == _52_CARD_DECK || volume == _52_CARD_DECK_PLUS_JOKERS) ? TWO : SIX);
 				r <= ACE;
 				r++){
 				CARD c((SUIT)s, (RANK)r);
@@ -114,45 +115,7 @@ public:
         toMix();
 	}
 
-/*
-	void showDeck(){
-        for (size_t i = 0; i < cards.size(); i++){
-            if (cards[i].rank <= 10)
-                std::cout << cards[i].rank;
-            else switch(cards[i].rank){
-			case JACK:
-				std::cout << 'J';
-				break;
-			case QUEEN:
-				std::cout << 'Q';
-				break;
-			case KING:
-				std::cout << 'K';
-				break;
-			case ACE:
-				std::cout << 'A';
-				break;
-			}
-
-            switch (cards[i].suit){
-			case DIAMONDS:
-				std::cout << 'D';//'♦';
-				break;
-			case HEARTS:
-				std::cout << 'H';//'♥';
-				break;
-			case CLUBS:
-				std::cout << 'C';//'♣';
-				break;
-			case SPADES:
-				std::cout << 'S';// '♠';
-				break;
-			}
-			std::cout << std::endl;			
-		}
-	}
-*/
-	//friend class MANAGER;
+    //friend class DEALER;
 };
 
 #endif //_CARD_DESK_H

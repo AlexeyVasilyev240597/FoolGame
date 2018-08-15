@@ -66,11 +66,13 @@ FOOL_RULES::END_LOCAL_STATE FOOL_RULES::isEndLocal(){
     //gameOver();
 
     if (active->state == FOOL_PLAYER::ADDING &&
-       (field->card_count_from_attacking - field->card_count_from_defencing) == passive->getVolume())
+       (field->counter[FOOL_FIGHT_FIELD::FROM_ATTAKING] -
+        field->counter[FOOL_FIGHT_FIELD::FROM_DEFENCING]) == passive->getVolume())
         return GIVE_AWAY;
 
     if (active->state == FOOL_PLAYER::TAKING &&
-       (field->card_count_from_attacking - field->card_count_from_defencing) == active->getVolume())
+        (field->counter[FOOL_FIGHT_FIELD::FROM_ATTAKING] -
+         field->counter[FOOL_FIGHT_FIELD::FROM_DEFENCING]) == active->getVolume())
         return GIVE_AWAY;
 
     if (active->state == FOOL_PLAYER::DEFENCE &&

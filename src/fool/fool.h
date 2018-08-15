@@ -9,9 +9,13 @@
 class   FOOL_GAME:public FOOL_RULES{
 Q_OBJECT
 private:
-    //FOOL_PLAYER *pl1, *pl2;
     DEALER* dealer;
+
+    //items
     FOOL_PLAYER_SET_VIEW *pl1_item, *pl2_item;
+    FOOL_PRICUP_SET_VIEW *pr_item;
+    FOOL_FIGHT_FIELD_SET_VIEW *f_item;
+    FOOL_BEATEN_SET_VIEW *b_item;
 
 public: 
     //FOOL_GAME();

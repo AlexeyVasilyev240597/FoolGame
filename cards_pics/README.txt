@@ -1,6 +1,6 @@
-/0		/0.PNG === BACK_SIDE
+/0                                      /0.PNG  === BACK_SIDE
 
-/1 === RED	/0 === NO_SUIT		/1.PNG  === RED_JOCKER
+/1 === RED	/0 === NO_SUIT		/1.PNG  === RED_JOKER
 
 		/1 === DIAMONDS		/2.PNG  === TWO_OF_DIAMONDS
 					...
@@ -11,7 +11,7 @@
 		/2 === HEARTS		/2.PNG  === TWO_OF_HEARTS
 					...
 
-/2 === BLACK	/0 === NO_SUIT		/1.PNG  === BLACK_JOCKER
+/2 === BLACK	/0 === NO_SUIT		/1.PNG  === BLACK_JOKER
 
 		/3 === CLUBS		/2.PNG  === TWO_OF_CLUBS
 					...

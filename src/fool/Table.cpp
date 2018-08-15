@@ -5,61 +5,51 @@ std::vector<CARD*> FOOL_PRICUP::giveCard(size_t number){
     std::vector<CARD*> cards;
 
 	//if (number > my_set.size())
-	//return cards;
-	//else cards.reserve(number);
+        //number = my_set.size();
 
-    //bool have_last_close_card = my_set.size() >= 2;
 
 	for (size_t i = 0; i < number; i++){
-		cards.push_back(my_set.at(0));
+        cards.push_back(my_set.front());
 		my_set.erase(my_set.begin());
 	}
 
-    if (my_set.size() <= 1)
-        pr_set_view->pileImg->setVisible(false);
-    //if (have_last_close_card && my_set.size() <= 1)
-        //delete pr_set_view->pileImg;
-
-    if (my_set.empty())
-        pr_set_view->trumpImg->setVisible(false);
-        //delete pr_set_view->trumpImg;
-
+    emit removedFromSet(my_set.size());
     //qDebug() << "in Pricup " << this->getVolume() <<"cards";
 
 	return cards;
 }
 
-void FOOL_PRICUP::dealerGetOut(){
-    if (!my_set.empty()){
-        my_set.back()->changeFaceState(UP);
-
-        pr_set_view->trumpImg = new CARD_ITEM(QPointF(18, 0), my_set.back());
-        pr_set_view->trumpImg->setParentItem(pr_set_view);
-        pr_set_view->trumpImg->setTransformOriginPoint(pr_set_view->trumpImg->mWidth/2,
-                                                       pr_set_view->trumpImg->mHeigth/2);
-        pr_set_view->trumpImg->setRotation(90);
-
-        pr_set_view->pileImg->setParentItem(pr_set_view);
-
+void FOOL_PRICUP::dealerGaveOut(){
+    if (!my_set.empty())
+    {
+        my_set.back()->changeFaceState(UP);        
+        emit addedToSet(my_set.back());
         emit getTrumpSuit(my_set.back()->getSuit());
     }
 }
 
-/*
-void FOOL_PRICUP::initSetView(QPointF pos, int w, int h){
-    pr_set_view = new FOOL_PRICUP_SET_VIEW(pos, w, h);
+
+void FOOL_PRICUP::initSetView(FOOL_PRICUP_SET_VIEW* pr_set_view){
+    //pr_set_view = new FOOL_PRICUP_SET_VIEW(pos, w, h);
+
+    QObject::connect(this, &FOOL_PRICUP::addedToSet,
+                     pr_set_view, &FOOL_PRICUP_SET_VIEW::gaveOut);
+
+
+    QObject::connect(this, &FOOL_PRICUP::removedFromSet,
+                     pr_set_view, &FOOL_PRICUP_SET_VIEW::removeFromPile);
+
 }
-*/
+
 
 //-----------------------------BEATEN-----------------------------
 void FOOL_BEATEN::addToSet(std::vector<CARD*> cards){
     for (size_t i = 0; i < cards.size(); i++){
+        if (my_set.empty())
+            emit addedToSet();
         my_set.push_back(cards[i]);
-        my_set.back()->changeFaceState(DOWN);
+        my_set.back()->changeFaceState(DOWN);        
     }
-
-    if (b_set_view->childItems().empty())
-        b_set_view->pileImg->setParentItem(b_set_view);
 
     //qDebug() << "in Beaten " << this->getVolume() <<"cards";
 }
@@ -69,44 +59,35 @@ std::vector<CARD*> FOOL_BEATEN::giveCard(){
     std::vector<CARD*> cards;
 	return cards;
 }
-/*
-void FOOL_BEATEN::initSetView(QPointF pos, int w, int h){
-    b_set_view = new FOOL_BEATEN_SET_VIEW(pos, w, h);
+
+void FOOL_BEATEN::initSetView(FOOL_BEATEN_SET_VIEW *b_set_view){
+    QObject::connect(this, &FOOL_BEATEN::addedToSet,
+                     b_set_view, &FOOL_BEATEN_SET_VIEW::firstAdded);
 }
-*/
+
 //-----------------------------FIELD-----------------------------
 void FOOL_FIGHT_FIELD::addToSet(std::vector<CARD*> cards, FOOL_PLAYER::PLAYER_STATE s){
     my_set.push_back(cards[0]);
     my_set.back()->changeFaceState(UP);
-    //size_t index = my_set.size()-1;
-    qreal x(0), y(0);
 
+    size_t index = 0;
     if (s == FOOL_PLAYER::ATTACK || s == FOOL_PLAYER::ADDING){
-        card_count_from_attacking++;
-        x = 80 * 1.5 * ((card_count_from_attacking - 1) % 3);
-        y = 116 * 1.25 * (card_count_from_attacking > 3);
+        counter[FROM_ATTAKING]++;
+        index = counter[FROM_ATTAKING];
+        //x = 80 * 1.5 * ((index - 1) % 3);
+        //y = 116 * 1.25 * (index > 3);
     }
 
     if (s == FOOL_PLAYER::DEFENCE || s == FOOL_PLAYER::TAKING){
-        card_count_from_defencing++;
-        x = 80 / 2 + 80 * 1.5 * ((card_count_from_defencing-1) % 3);
-        y = 116 * 0.25 + 116 * 1.25 * (card_count_from_defencing > 3);
+        counter[FROM_DEFENCING]++;
+        index = counter[FROM_DEFENCING];
+        //x = 80 / 2 + 80 * 1.5 * ((index - 1) % 3);
+        //y = 116 * 0.25 + 116 * 1.25 * (index > 3);
     }
 
-    //for (size_t i = 0; i < cards.size(); i++){
-//       double x = 80 / 2 * (index % 6 % 2) + 80 * 1.5 * (index % 6 / 2),
-//              y = 116 * 1.25 * (index > 5) + 116 * 0.25 * (index % 2);
-
-       CARD_ITEM* c = new CARD_ITEM(QPoint(x, y), my_set.back());
-       f_f_set_view->cards_in_fight.push_back(c);
-       f_f_set_view->cards_in_fight.back()->setParentItem(f_f_set_view);
-
-       //6 * 2 )))
-       //if (my_set.size() == 6 * 2)
-        //emit iFilled();
-    //}
-
-   emit setUpdated();
+    emit addedToSet(my_set.back(),
+                    s == FOOL_PLAYER::ATTACK || s == FOOL_PLAYER::ADDING,
+                    index);
 }
 
 std::vector<CARD*> FOOL_FIGHT_FIELD::giveCard(){
@@ -115,22 +96,24 @@ std::vector<CARD*> FOOL_FIGHT_FIELD::giveCard(){
     my_set.swap(cards);
     my_set.clear();
 
-    for (size_t i = 0; i < f_f_set_view->cards_in_fight.size(); i++)
-        delete f_f_set_view->cards_in_fight[i];
-    f_f_set_view->cards_in_fight.clear();
-    card_count_from_attacking = card_count_from_defencing = 0;
+    counter[FROM_ATTAKING] = 0;
+    counter[FROM_DEFENCING] = 0;
 
-    emit setUpdated();
+    emit removedFromSet();
 
     return cards;
 }
-/*
-void FOOL_FIGHT_FIELD::initSetView(QPointF pos, int w, int h){
-    f_f_set_view = new FOOL_FIGHT_FIELD_SET_VIEW(pos, w, h);
+
+void FOOL_FIGHT_FIELD::initSetView(FOOL_FIGHT_FIELD_SET_VIEW *f_f_set_view){
+    QObject::connect(this, &FOOL_FIGHT_FIELD::addedToSet,
+                     f_f_set_view, &FOOL_FIGHT_FIELD_SET_VIEW::addCardItem);
+
+    QObject::connect(this, &FOOL_FIGHT_FIELD::removedFromSet,
+                     f_f_set_view, &FOOL_FIGHT_FIELD_SET_VIEW::removeAllItems);
 }
-*/
+
 //-----------------------------DEALER-----------------------------
-void DEALER::getOutCards(ELEMENT* elem){
+void DEALER::giveOutCards(ELEMENT* elem){
 
     if (elem->getInitVolume() == 0)
         return;

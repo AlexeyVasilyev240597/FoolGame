@@ -2,9 +2,8 @@
 #define RULES_H
 #include <QObject>
 #include "../abstract/CardDeck.h"
-#include "../abstract/GameElement.h"
+//#include "../abstract/GameElement.h"
 #include "../drawing/GameItems.h"
-//#include "../drawing/GameScene.h"
 #include "Table.h"
 #include "Player.h"
 
@@ -17,6 +16,7 @@ protected:
     SUIT trump;
 
     //FOOL_PLAYER *active, *passive;
+    //elements
     FOOL_PLAYER *pl1, *pl2;
 
     FOOL_PRICUP *pr;
@@ -33,17 +33,11 @@ protected:
 
     //PLAYER_STATE getMyState();
 
-
 signals:
     void transferMove();
 
 public slots:
     void setTrump(SUIT t){trump = t;}
-
-    //void fieldFilled();
-
-    //void endLocalFight();
-
 };
 
 #endif // RULES_H

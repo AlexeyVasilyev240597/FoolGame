@@ -1,0 +1,78 @@
+#include <QDebug>
+#include "setView.h"
+
+viewExample::viewExample()
+{
+  setRenderHint(QPainter::Antialiasing);
+
+  setCacheMode(QGraphicsView::CacheNone);
+
+  setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+  setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+
+  setWindowTitle("viewExample");
+
+  setFrameStyle(0);
+  setSceneRect(0, 0, 880, 640);
+  setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+  setFixedSize(880, 640);
+
+  mScene.setItemIndexMethod(QGraphicsScene::NoIndex);
+
+
+  setScene(&mScene);
+  _init_view_elements();
+}
+//------------------------------------------------------------------------------
+void viewExample::_init_view_elements()
+{
+    mBtnCard1.setPos(50, 50);
+    mBtnCard1.setImage(":/pics/cards_pics/0/1/6.png");
+    connect(&mBtnCard1, &button::btnMouseReleaseEvent,
+            this, &viewExample::btn_Card1_clicked);
+
+    mBtnCard2.setPos(150, 150);
+    mBtnCard2.setImage(":/pics/cards_pics/1/3/6.png");
+    connect(&mBtnCard2, &button::btnMouseReleaseEvent,
+            this, &viewExample::btn_Card2_clicked);
+
+    mBtnCard3.setPos(250, 250);
+    mBtnCard3.setImage(":/pics/cards_pics/1/4/6.png");
+    connect(&mBtnCard3, &button::btnMouseReleaseEvent,
+            this, &viewExample::btn_Card3_clicked);
+
+    //в этой последовательности они "накладываются" друг на друга
+    mScene.addItem(&mBtnCard1);
+    mScene.addItem(&mBtnCard2);
+    mScene.addItem(&mBtnCard3);
+}
+/*
+//------------------------------------------------------------------------------
+void viewExample::btn_B_clicked(Qt::MouseButton aBtn)
+{
+  qWarning() << "B clicked " << aBtn;
+}
+//------------------------------------------------------------------------------
+void viewExample::btn_C_clicked(Qt::MouseButton aBtn)
+{
+  qWarning() << "C clicked " << aBtn;
+}
+*/
+//------------------------------------------------------------------------------
+void viewExample::btn_Card1_clicked(Qt::MouseButton aBtn)
+{
+  qWarning() << "Card clicked 1";
+  mBtnCard1.setPos(200, 200);
+}
+void viewExample::btn_Card2_clicked(Qt::MouseButton aBtn)
+{
+  qWarning() << "Card clicked 2";
+  mBtnCard2.setPos(400, 200);
+
+}
+void viewExample::btn_Card3_clicked(Qt::MouseButton aBtn)
+{
+  qWarning() << "Card clicked 3";
+  mBtnCard3.setPos(600, 200);
+}

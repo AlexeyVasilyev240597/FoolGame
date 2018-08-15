@@ -23,16 +23,19 @@ void FOOL_GAME::init(){
     emit addElem(pl2_item);
 
     pr = new FOOL_PRICUP(_36_CARD_DECK - PLAYER_VOLUME_INIT - PLAYER_VOLUME_INIT);
-    pr->pr_set_view = new FOOL_PRICUP_SET_VIEW(QPointF(0, 262), 116, 116);
-    emit addElem(pr->pr_set_view);
+    pr_item = new FOOL_PRICUP_SET_VIEW(QPointF(0, 262), 116, 116);
+    pr->initSetView(pr_item);
+    emit addElem(pr_item);
 
     field = new FOOL_FIGHT_FIELD();
-    field->f_f_set_view = new FOOL_FIGHT_FIELD_SET_VIEW(QPointF(300, 150), 360, 290);
-    emit addElem(field->f_f_set_view);
+    f_item = new FOOL_FIGHT_FIELD_SET_VIEW(QPointF(300, 150), 360, 290);
+    field->initSetView(f_item);
+    emit addElem(f_item);
 
     beaten = new FOOL_BEATEN();
-    beaten->b_set_view = new FOOL_BEATEN_SET_VIEW(QPointF(880, 262), 80, 116);
-    emit addElem(beaten->b_set_view);
+    b_item = new FOOL_BEATEN_SET_VIEW(QPointF(880, 262), 80, 116);
+    beaten->initSetView(b_item);
+    emit addElem(b_item);
 }
 /*
 FOOL_GAME::~FOOL_GAME(){
@@ -76,16 +79,16 @@ void FOOL_GAME::fillSetsOfPlayers()
 
 void FOOL_GAME::game()
 {
-    QObject::connect(dealer, &DEALER::iGetOut,
-                     pr, &FOOL_PRICUP::dealerGetOut);
+    QObject::connect(dealer, &DEALER::iGaveOut,
+                     pr, &FOOL_PRICUP::dealerGaveOut);
 
     QObject::connect(pr, &FOOL_PRICUP::getTrumpSuit,
                      this, &FOOL_GAME::setTrump);
 
-    dealer->getOutCards(pl1);
-    dealer->getOutCards(pl2);
-    dealer->getOutCards(pr); 
-    emit dealer->iGetOut();
+    dealer->giveOutCards(pl1);
+    dealer->giveOutCards(pl2);
+    dealer->giveOutCards(pr);
+    emit dealer->iGaveOut();
 
     //pl1->setTrump(trump);
     //pl2->setTrump(trump);

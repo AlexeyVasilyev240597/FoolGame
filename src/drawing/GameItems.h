@@ -60,16 +60,9 @@ public:
     }
 
     BUTTON *itIsBeaten, *iTake, *takeAway;
-    //если есть возможность менять очередность добавления карт в набор,
-    //то имеет смысл делать map и вызывать updateSet() не так часто
     std::map<CARD*, CARD_BTN*> card_btns;
-    //std::vector<CARD_BTN*> card_btns;
-
 
     QPointF getMyPos(size_t index, size_t n);
-
-
-    //void setPlayer(FOOL_PLAYER *player){my_player = player;}
 
 signals:
     void choosedCard(CARD*);
@@ -88,19 +81,24 @@ public slots:
 };
 
 //-----------------------------PRICUP'S ITEM-----------------------------
-class FOOL_PRICUP_SET_VIEW : public MY_ITEM
+class FOOL_PRICUP_SET_VIEW: public QObject, public MY_ITEM
 {
+Q_OBJECT
 public:
-    FOOL_PRICUP_SET_VIEW(QPointF pos, int w, int h):MY_ITEM(pos, w, h){        
-        pileImg = new CARD_ITEM(QPointF(0, 0));
-    }
+    FOOL_PRICUP_SET_VIEW(QPointF pos, int w, int h):MY_ITEM(pos, w, h){}
 
     CARD_ITEM *pileImg, *trumpImg;
+
+public slots:
+    void gaveOut(CARD*);
+
+    void removeFromPile(size_t);
 };
 
 //-----------------------------FIELD'S ITEM-----------------------------
-class FOOL_FIGHT_FIELD_SET_VIEW : public MY_ITEM
+class FOOL_FIGHT_FIELD_SET_VIEW : public QObject, public MY_ITEM
 {
+Q_OBJECT
 public:
     FOOL_FIGHT_FIELD_SET_VIEW(QPointF pos, int w, int h):MY_ITEM(pos, w, h){}
 
@@ -108,24 +106,26 @@ public:
     std::vector<CARD_ITEM*> cards_in_fight;
     QString text;
     void paint(QPainter*, const QStyleOptionGraphicsItem*, QWidget*) override;
-//public slots:
-    //void setUpdate(std::vector<CARD*>);
 
-//private:
-    //void drawSetView();
+    QPointF getMyPos(bool, size_t);
 
+public slots:
+    void addCardItem(CARD*, bool, size_t);
+
+    void removeAllItems();
 };
 
 
 //-----------------------------BEATEN'S ITEM-----------------------------
-class FOOL_BEATEN_SET_VIEW: public MY_ITEM
+class FOOL_BEATEN_SET_VIEW:public QObject, public MY_ITEM
 {
+Q_OBJECT
 public:
-    FOOL_BEATEN_SET_VIEW(QPointF pos, int w, int h):MY_ITEM(pos, w, h){
-        pileImg = new CARD_ITEM(QPointF(0, 0));
-    }
+    FOOL_BEATEN_SET_VIEW(QPointF pos, int w, int h):MY_ITEM(pos, w, h){}
 
     CARD_ITEM *pileImg;
 
+public slots:
+    void firstAdded();
 };
 #endif // BUTTON_HPP

@@ -4,13 +4,12 @@
 #include <vector>
 
 #include "../abstract/CardDeck.h"
-//#include "../drawing/GameItems.h"
 #include <QDebug>
 
 class ELEMENT{
 protected:
     std::vector<CARD*> my_set;
-    //лучше просто передать в getOutCards() для каждого элемента,
+    //лучше просто передать в giveOutCards() для каждого элемента,
     //например, map, который лежит в RULES
     size_t init_volume;
 
@@ -51,11 +50,13 @@ public:
         }
     }
 
-    virtual std::vector<CARD*> giveCard() = 0;
+    virtual std::vector<CARD*> giveCard(){
+        std::vector<CARD*> cards;
+        cards.push_back(my_set.front());
+        my_set.erase(my_set.begin());
 
-    //virtual void initSetView(QPointF, int, int){}
-
-    //virtual void drawSet(){}
+        return cards;
+    }
 };
 
 #endif // _GAME_ELEMENT_H
