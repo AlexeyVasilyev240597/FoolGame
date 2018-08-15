@@ -13,7 +13,8 @@
 #include "Player.h"
 #include <QDebug>
 
-class FOOL_PRICUP : public ELEMENT{
+class FOOL_PRICUP: public QObject, public ELEMENT{
+Q_OBJECT
 private:
     SUIT trump;
 
@@ -29,13 +30,17 @@ public:
 
         return cards;
     }
-    std::vector<CARD*> giveCard(size_t number);
-	
-	SUIT getTrumpSuit();
+    std::vector<CARD*> giveCard(size_t number);		
 
-    void initSetView(QPointF pos, int w, int h);
+    //void initSetView(QPointF pos, int w, int h);
 
     void addItems();
+
+signals:
+    void getTrumpSuit(SUIT);
+
+public slots:
+    void dealerGetOut();
 };
 
 
@@ -47,7 +52,7 @@ public:
 
     std::vector<CARD*> giveCard();
 
-    void initSetView(QPointF pos, int w, int h);
+    //void initSetView(QPointF pos, int w, int h);
 
     void addToSet(std::vector<CARD*> cards);
 };
@@ -67,7 +72,7 @@ public:
 
     std::vector<CARD*> giveCard();
 
-    void initSetView(QPointF pos, int w, int h);
+    //void initSetView(QPointF pos, int w, int h);
 
     void addToSet(std::vector<CARD*> cards, FOOL_PLAYER::PLAYER_STATE s);
 
@@ -78,8 +83,20 @@ signals:
     //void iFilled();
 };
 
+/*
+аааааа, короче идея:
+1. пусть дилер раздает натоящие карты - объекты, а не указатели,
+это будет естественней, тогда никто не сможет присвоить какому-нибудь указателю карту,
+которая у него есть;
 
-class DEALER{
+2. надо будет еще замутить конструктор карты explicit;
+
+3. и showSet() и showLastCard() у элемента будут возвращать const &CARD - тоже естественно,
+да и уровни доступа будут иметь смысл тогда
+
+ */
+class DEALER: public QObject{
+Q_OBJECT
 private:
     DECK *deck;
 //RULES *rules;
@@ -94,6 +111,10 @@ public:
     void getOutCards(ELEMENT* elem);
 
     void exchange(ELEMENT* from, ELEMENT* to);
+
+signals:
+    void iGetOut();
+
 };
 
 

@@ -8,41 +8,31 @@ std::vector<CARD*> FOOL_PRICUP::giveCard(size_t number){
 	//return cards;
 	//else cards.reserve(number);
 
-    bool have_last_close_card = my_set.size() >= 2;
+    //bool have_last_close_card = my_set.size() >= 2;
 
 	for (size_t i = 0; i < number; i++){
 		cards.push_back(my_set.at(0));
 		my_set.erase(my_set.begin());
 	}
 
-    if (have_last_close_card && my_set.size() <= 1)
-        delete pr_set_view->pileImg;
+    if (my_set.size() <= 1)
+        pr_set_view->pileImg->setVisible(false);
+    //if (have_last_close_card && my_set.size() <= 1)
+        //delete pr_set_view->pileImg;
 
     if (my_set.empty())
-        delete pr_set_view->trumpImg;
+        pr_set_view->trumpImg->setVisible(false);
+        //delete pr_set_view->trumpImg;
 
-    qDebug() << "in Pricup " << this->getVolume() <<"cards";
+    //qDebug() << "in Pricup " << this->getVolume() <<"cards";
 
 	return cards;
 }
 
-SUIT FOOL_PRICUP::getTrumpSuit(){
+void FOOL_PRICUP::dealerGetOut(){
     if (!my_set.empty()){
         my_set.back()->changeFaceState(UP);
-        addItems();
 
-        return my_set.back()->getSuit();
-    }
-    return NO_SUIT;
-}
-
-
-void FOOL_PRICUP::initSetView(QPointF pos, int w, int h){
-    pr_set_view = new FOOL_PRICUP_SET_VIEW(pos, w, h);
-}
-
-void FOOL_PRICUP::addItems(){
-    if(!my_set.empty()){        
         pr_set_view->trumpImg = new CARD_ITEM(QPointF(18, 0), my_set.back());
         pr_set_view->trumpImg->setParentItem(pr_set_view);
         pr_set_view->trumpImg->setTransformOriginPoint(pr_set_view->trumpImg->mWidth/2,
@@ -50,8 +40,16 @@ void FOOL_PRICUP::addItems(){
         pr_set_view->trumpImg->setRotation(90);
 
         pr_set_view->pileImg->setParentItem(pr_set_view);
+
+        emit getTrumpSuit(my_set.back()->getSuit());
     }
 }
+
+/*
+void FOOL_PRICUP::initSetView(QPointF pos, int w, int h){
+    pr_set_view = new FOOL_PRICUP_SET_VIEW(pos, w, h);
+}
+*/
 
 //-----------------------------BEATEN-----------------------------
 void FOOL_BEATEN::addToSet(std::vector<CARD*> cards){
@@ -63,7 +61,7 @@ void FOOL_BEATEN::addToSet(std::vector<CARD*> cards){
     if (b_set_view->childItems().empty())
         b_set_view->pileImg->setParentItem(b_set_view);
 
-    qDebug() << "in Beaten " << this->getVolume() <<"cards";
+    //qDebug() << "in Beaten " << this->getVolume() <<"cards";
 }
 
 std::vector<CARD*> FOOL_BEATEN::giveCard(){
@@ -71,11 +69,11 @@ std::vector<CARD*> FOOL_BEATEN::giveCard(){
     std::vector<CARD*> cards;
 	return cards;
 }
-
+/*
 void FOOL_BEATEN::initSetView(QPointF pos, int w, int h){
     b_set_view = new FOOL_BEATEN_SET_VIEW(pos, w, h);
 }
-
+*/
 //-----------------------------FIELD-----------------------------
 void FOOL_FIGHT_FIELD::addToSet(std::vector<CARD*> cards, FOOL_PLAYER::PLAYER_STATE s){
     my_set.push_back(cards[0]);
@@ -126,11 +124,11 @@ std::vector<CARD*> FOOL_FIGHT_FIELD::giveCard(){
 
     return cards;
 }
-
+/*
 void FOOL_FIGHT_FIELD::initSetView(QPointF pos, int w, int h){
     f_f_set_view = new FOOL_FIGHT_FIELD_SET_VIEW(pos, w, h);
 }
-
+*/
 //-----------------------------DEALER-----------------------------
 void DEALER::getOutCards(ELEMENT* elem){
 

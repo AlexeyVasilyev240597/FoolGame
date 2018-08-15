@@ -2,9 +2,13 @@
 #include "GameScene.h"
 #include "../abstract/MyItem.h"
 #include "../fool/Table.h"
+#include <QObject>
 
-SCENE_VIEW::SCENE_VIEW()
+SCENE_VIEW::SCENE_VIEW(FOOL_GAME *game)
 {
+    QObject::connect(game, &FOOL_GAME::addElem,
+                     this, &SCENE_VIEW::addItem);
+
    //пройдись по ним и посмотри, что убрать
   setRenderHint(QPainter::Antialiasing);
 
@@ -47,11 +51,8 @@ void SCENE_VIEW::initGameScene(){
    qWarning() << "i am in initGameScene";
 }
 */
-void SCENE_VIEW::setItems(std::vector<MY_ITEM*> items){
-    for(size_t i = 0; i < items.size(); i++){
-        mScene.addItem(items[i]);
-        //qDebug() << items[i]->zValue();
-    }
+void SCENE_VIEW::addItem(MY_ITEM* item){
+        mScene.addItem(item);
 }
 /*
 //------------------------------------------------------------------------------

@@ -13,6 +13,7 @@
 #include "../abstract/CardDeck.h"
 #include "../abstract/MyItem.h"
 
+
 //-----------------------------CARD_BUTTON-----------------------------
 class CARD_BTN : public QObject, public CARD_ITEM{
 Q_OBJECT
@@ -31,7 +32,7 @@ public:
   void hoverLeaveEvent(QGraphicsSceneHoverEvent*)   override;
 
 signals:
-  void cardButtonClicked(Qt::MouseButton);
+  void cardButtonClicked(CARD*);
 
 protected:
   //bool mIsMoving{false};
@@ -39,14 +40,13 @@ protected:
   bool mHover{false};
 
 public:
-  bool isChanged{false};
-
   //QPointF mStartMovePos;
 };
 
 //-----------------------------PLAYER'S ITEM-----------------------------
-class FOOL_PLAYER_SET_VIEW : public MY_ITEM
+class FOOL_PLAYER_SET_VIEW : public QObject, public MY_ITEM
 {
+Q_OBJECT
 public:
     FOOL_PLAYER_SET_VIEW(QPointF pos, int w, int h):MY_ITEM(pos, w, h){
         itIsBeaten = new BUTTON(QPointF(80*6, 0), "beaten");
@@ -68,6 +68,23 @@ public:
 
     QPointF getMyPos(size_t index, size_t n);
 
+
+    //void setPlayer(FOOL_PLAYER *player){my_player = player;}
+
+signals:
+    void choosedCard(CARD*);
+
+public slots:
+    void addToMap(std::vector<CARD*>&);
+
+    void removeFromMap(std::vector<CARD*>&);
+
+    void clickedCard(CARD*);
+
+    void customizeButtons(bool cards, bool beaten, bool take, bool take_away);
+
+    //потом слот понадобится для графического отображения сигнала об ошибке!
+    //void changeCardState(CARD*);
 };
 
 //-----------------------------PRICUP'S ITEM-----------------------------

@@ -5,29 +5,42 @@ void FOOL_PLAYER::addToSet(std::vector<CARD*> cards)
 {
     for (size_t i = 0; i < cards.size(); i++){
         my_set.push_back(cards[i]);
-        //в перегрузке для player по-другому
+        //можно искать место для вставки здесь
+        //и не использовать сложную сортировку
         my_set.back()->changeFaceState(UP);//is_user ? UP : DOWN);
     }
 
-    for (size_t i = 0; i < my_set.size(); i++){
+    emit addedToSet(my_set);
+}
 
-        //if my_set[i] is not found
-        if (pl_set_view->card_btns.find(my_set[i]) ==
-                pl_set_view->card_btns.end()){
+void FOOL_PLAYER::initSetView(FOOL_PLAYER_SET_VIEW *pl_set_view){
 
-            CARD_BTN* c_b = new CARD_BTN(pl_set_view->getMyPos(i, my_set.size()), my_set[i]);
-            pl_set_view->card_btns.insert(std::pair<CARD*, CARD_BTN*>(my_set[i], c_b));
+QObject::connect(this, &FOOL_PLAYER::addedToSet,
+                 pl_set_view, &FOOL_PLAYER_SET_VIEW::addToMap);
 
-            pl_set_view->card_btns.at(my_set[i])->setParentItem(pl_set_view);
-            QObject::connect(pl_set_view->card_btns.at(my_set[i]), &CARD_BTN::cardButtonClicked,
-                             this, &FOOL_PLAYER::changeCard);
-        }
-        else
-            pl_set_view->card_btns.at(my_set[i])->setPos(pl_set_view->getMyPos(i, my_set.size()));
+QObject::connect(this, &FOOL_PLAYER::removedFromSet,
+                 pl_set_view, &FOOL_PLAYER_SET_VIEW::removeFromMap);
 
-        pl_set_view->card_btns.at(my_set[i])->setZValue(i + 1);
-        //qDebug() << my_set[i]->getRank() << my_set[i]->getSuit();
-    }
+
+QObject::connect(pl_set_view, &FOOL_PLAYER_SET_VIEW::choosedCard,
+                 this, &FOOL_PLAYER::changeCard);
+
+QObject::connect(pl_set_view->itIsBeaten, &BUTTON::buttonClicked,
+                 this, &FOOL_PLAYER::itIsBeaten);
+
+QObject::connect(pl_set_view->iTake, &BUTTON::buttonClicked,
+                 this, &FOOL_PLAYER::iTakeIt);
+
+QObject::connect(pl_set_view->takeAway, &BUTTON::buttonClicked,
+                 this, &FOOL_PLAYER::takeAway);
+
+/*потом конект понадобится для графического отображения сигнала об ошибке!
+QObject::connect(this, &FOOL_PLAYER::choosedWrongCard,
+                 pl_set_view, &FOOL_PLAYER_SET_VIEW::changeCardState);
+*/
+
+QObject::connect(this, &FOOL_PLAYER::customizeButtons,
+                 pl_set_view, &FOOL_PLAYER_SET_VIEW::customizeButtons);
 }
 
 std::vector<CARD*> FOOL_PLAYER::giveCard(){
@@ -42,35 +55,17 @@ std::vector<CARD*> FOOL_PLAYER::giveCard(){
             break;
         }
 
-    delete pl_set_view->card_btns.at(choosed_card);
-    pl_set_view->card_btns.erase(choosed_card);
+    choosed_card = NULL;
 
-    size_t index = 0;
-    for (std::map<CARD*, CARD_BTN*>::iterator it = pl_set_view->card_btns.begin();
-         it != pl_set_view->card_btns.end();
-         it++, index++){
-
-        it->second->setPos(pl_set_view->getMyPos(index, my_set.size()));
-        it->second->setZValue(index + 1);
-     }
+    emit removedFromSet(cards);
 
     return cards;
 }
 
-void FOOL_PLAYER::changeCard(Qt::MouseButton){
-    for (std::map<CARD*, CARD_BTN*>::iterator it = pl_set_view->card_btns.begin(); it != pl_set_view->card_btns.end(); it++)
-        if (it->second->isChanged){
-            choosed_card = it->first;
-            break;
-        }
+void FOOL_PLAYER::changeCard(CARD* card){
+    choosed_card = card;
     //qDebug() << changed_card->getSuit() << changed_card->getRank();
     emit chooseIsMade();
-}
-
-void FOOL_PLAYER::initSetView(QPointF pos, int w, int h){
-    pl_set_view = new FOOL_PLAYER_SET_VIEW(pos, w, h);
-    //pl_set_view->itIsBeaten->setGeometry(QRect(QPoint(80*6,  0), QSize(30, 30)));
-    //pl_set_view->itIsBeaten->setGeometry(QRect(QPoint(80*6, 40), QSize(30, 30)));
 }
 
 void FOOL_PLAYER::showMinTrump(){
@@ -78,19 +73,14 @@ void FOOL_PLAYER::showMinTrump(){
 }
 
 
-void FOOL_PLAYER::customizeButtons(){
-    for (std::map<CARD*, CARD_BTN*>::iterator it = pl_set_view->card_btns.begin(); it != pl_set_view->card_btns.end(); it++)
-        it->second->setEnabled(my_move);
-
-    pl_set_view->iTake->setVisible(my_move && state == DEFENCE);
-    pl_set_view->itIsBeaten->setVisible(my_move && state == ATTACK);
-    pl_set_view->takeAway->setVisible(state == ADDING);
-}
-
 void FOOL_PLAYER::initState(PLAYER_STATE s){
     state = s;
     my_move = state == ATTACK;
-    customizeButtons();
+
+    emit customizeButtons(my_move,
+                          my_move && state == FOOL_PLAYER::ATTACK,
+                          my_move && state == FOOL_PLAYER::DEFENCE,
+                          state == FOOL_PLAYER::ADDING);
 }
 
 void FOOL_PLAYER::changeState(){
@@ -113,13 +103,26 @@ void FOOL_PLAYER::changeState(){
         break;
     }
 
-    customizeButtons();
+    emit customizeButtons(my_move,
+                          my_move && state == FOOL_PLAYER::ATTACK,
+                          my_move && state == FOOL_PLAYER::DEFENCE,
+                                     state == FOOL_PLAYER::ADDING);
 }
 
 void FOOL_PLAYER::changeMoveValue(){
     my_move = !my_move;
-    customizeButtons();
+
+    emit customizeButtons(my_move,
+                          my_move && state == FOOL_PLAYER::ATTACK,
+                          my_move && state == FOOL_PLAYER::DEFENCE,
+                                     state == FOOL_PLAYER::ADDING);
 }
+/*
+void FOOL_PLAYER::iMistake(){
+    emit choosedWrongCard(choosed_card);
+    choosed_card = NULL;
+}
+*/
 /*
 void FOOL_PLAYER::sortSet(){
     for (size_t i = 0; i < my_set.size() - 1; i++)

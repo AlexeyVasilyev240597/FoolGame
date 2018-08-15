@@ -30,7 +30,8 @@ SOURCES += \
     src/fool/Player.cpp \
     src/abstract/MyItem.cpp \
     src/drawing/GameItems.cpp \
-    src/fool/Fool.cpp
+    src/fool/Fool.cpp \
+    src/fool/rules.cpp
 
 HEADERS += \
     src/abstract/CardDeck.h \
@@ -40,7 +41,8 @@ HEADERS += \
     src/abstract/GameElement.h \
     src/abstract/MyItem.h \
     src/drawing/GameItems.h \
-    src/fool/fool.h
+    src/fool/fool.h \
+    src/fool/rules.h
 
 FORMS +=
 

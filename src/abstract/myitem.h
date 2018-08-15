@@ -30,6 +30,8 @@ public:
 class CARD_ITEM :public MY_ITEM{
 public:
     CARD_ITEM(QPointF pos, CARD* c = NULL):MY_ITEM(pos, 0, 0){
+        my_card = c;
+
         QString path = ":/pics/cards_pics/";
         if (c == NULL)
             path += "0/0.png";
@@ -41,12 +43,14 @@ public:
             path += QString::number((int)c->getRank());
             path += ".png";
         }
+
         setImage(path);
     }
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 protected:
     QPixmap mPixMap;
+    CARD *my_card;
 
     void setImage(QString aPath){
         mPixMap.load(aPath);

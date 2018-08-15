@@ -4,14 +4,14 @@
 #include <vector>
 
 #include "../abstract/CardDeck.h"
-#include "../drawing/GameItems.h"
+//#include "../drawing/GameItems.h"
 #include <QDebug>
 
 class ELEMENT{
 protected:
     std::vector<CARD*> my_set;
     //лучше просто передать в getOutCards() для каждого элемента,
-    //например, map, который генерируется в RULES
+    //например, map, который лежит в RULES
     size_t init_volume;
 
     enum ACCESS{TO_NOONE, TO_HOLDER, TO_ALL} access;
@@ -53,7 +53,7 @@ public:
 
     virtual std::vector<CARD*> giveCard() = 0;
 
-    virtual void initSetView(QPointF, int, int){}
+    //virtual void initSetView(QPointF, int, int){}
 
     //virtual void drawSet(){}
 };

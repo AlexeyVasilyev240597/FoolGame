@@ -30,20 +30,27 @@ void CARD_BTN::hoverLeaveEvent(QGraphicsSceneHoverEvent*)
 
 void CARD_BTN::mouseReleaseEvent(QGraphicsSceneMouseEvent *apEvent)
 {
-    isChanged = true;
-    emit cardButtonClicked(apEvent->button());
+    //isChanged = true;
+    emit cardButtonClicked(my_card);
 }
+
+//-----------------------------FIGHT-FIELD-----------------------------
 
 void FOOL_FIGHT_FIELD_SET_VIEW::paint(QPainter *painter,
                                       const QStyleOptionGraphicsItem* /*option*/,
                                       QWidget* /*widget*/){
-  if (!text.isEmpty())
+  if (!text.isEmpty()){
+      QFont font = painter->font();
+      font.setPointSize(font.pointSize() * 5);
+      painter->setFont(font);
       painter->drawText(QRectF(0, 0, mWidth, mHeigth), Qt::AlignCenter, text);
+  }
 
   painter->drawRoundedRect(0, 0, mWidth, mHeigth, 5, 5);
 }
 
 
+//-----------------------------PLAYER-----------------------------
 QPointF FOOL_PLAYER_SET_VIEW::getMyPos(size_t index, size_t n){
     qreal x, y;
     if (n < 19){
@@ -66,3 +73,65 @@ QPointF FOOL_PLAYER_SET_VIEW::getMyPos(size_t index, size_t n){
 
     return QPoint(x, y);
 }
+
+
+void FOOL_PLAYER_SET_VIEW::addToMap(std::vector<CARD*> &set)
+{
+    for (size_t i = 0; i < set.size(); i++){
+        //if my_set[i] is not found
+        if (card_btns.find(set[i]) ==
+                card_btns.end()){
+
+            CARD_BTN* c_b = new CARD_BTN(getMyPos(i, set.size()), set[i]);
+            card_btns.insert(std::pair<CARD*, CARD_BTN*>(set[i], c_b));
+
+            card_btns.at(set[i])->setParentItem(this);
+            QObject::connect(card_btns.at(set[i]), &CARD_BTN::cardButtonClicked,
+                             this, FOOL_PLAYER_SET_VIEW::clickedCard);
+        }
+        else
+            card_btns.at(set[i])->setPos(getMyPos(i, set.size()));
+
+        card_btns.at(set[i])->setZValue(i + 1);
+        //qDebug() << my_set[i]->getRank() << my_set[i]->getSuit();
+    }
+}
+
+void FOOL_PLAYER_SET_VIEW::removeFromMap(std::vector<CARD*> &cards)
+{
+    for (size_t i = 0; i < cards.size(); i++){
+        delete card_btns.at(cards[i]);
+        card_btns.erase(cards[i]);
+    }
+
+    size_t index = 0;
+    for (std::map<CARD*, CARD_BTN*>::iterator it = card_btns.begin();
+         it != card_btns.end();
+         it++, index++){
+
+        it->second->setPos(getMyPos(index, card_btns.size()));
+        it->second->setZValue(index + 1);
+     }
+}
+
+void FOOL_PLAYER_SET_VIEW::clickedCard(CARD* card)
+{
+    emit choosedCard(card);
+}
+
+void FOOL_PLAYER_SET_VIEW::customizeButtons(bool cards, bool beaten, bool take, bool take_away){
+    for (std::map<CARD*, CARD_BTN*>::iterator it = card_btns.begin();
+         it != card_btns.end();
+         it++)
+        it->second->setEnabled(cards);
+
+    itIsBeaten->setVisible(beaten);
+    iTake->setVisible(take);
+    takeAway->setVisible(take_away);
+}
+/*
+void FOOL_PLAYER_SET_VIEW::changeCardState(CARD *card){
+    //card_btns.at(card)->isChanged = false;
+    qDebug() << "i in fool player set view change card state";
+}
+*/

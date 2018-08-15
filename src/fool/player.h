@@ -1,6 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+#include <QString>
 #include <vector>
 #include <string>
 #include <map>
@@ -22,24 +23,29 @@
 получать через него необходимую информацию (смена хода, карты на столе);
 4. ...
 */
-class FOOL_RULES;
 
-class FOOL_PLAYER :public QObject, public ELEMENT{
+class FOOL_PLAYER: public QObject, public ELEMENT{
 Q_OBJECT
 private:
+
     //std::vector<CARD*> my_set to std::map<CARD*, BUTTON*> card_button_set
     bool is_user{false};
-    SUIT trump{NO_SUIT};
 
-    //FOOL_FIGHT_FIELD *field{NULL};
-    //FOOL_RULES rules;
+    SUIT trump{NO_SUIT};
 
     void sortSet();
 
     //QPointF getMyPos(size_t index);
 
     //void itemsUpdate();
+public:
+        enum PLAYER_STATE{ATTACK, DEFENCE, ADDING, TAKING, NO_DEF} state{NO_DEF};
+
 signals:
+    void addedToSet(std::vector<CARD*>&);
+
+    void removedFromSet(std::vector<CARD*>&);
+
     void chooseIsMade();
 
     void itIsBeaten();
@@ -48,19 +54,25 @@ signals:
 
     void takeAway();
 
+    void choosedWrongCard(CARD*);
+
+    void customizeButtons(bool cards, bool beaten, bool take, bool take_away);
+
 public:
     //перенести в RULES
     bool my_move{false};
 
-    FOOL_PLAYER_SET_VIEW *pl_set_view;
+    QString name;
 
-    CARD *choosed_card{NULL};
+    //FOOL_PLAYER_SET_VIEW *pl_set_view;
 
-    //перенести в RULES
-    enum PLAYER_STATE{ATTACK, DEFENCE, ADDING, TAKING, NO_DEF} state{NO_DEF};
+    CARD *choosed_card{NULL};       
 
     //пока не написана getMinTrump(), первым ходит первый игрок
-    FOOL_PLAYER(size_t iv) : ELEMENT(TO_HOLDER, iv){}
+    FOOL_PLAYER(size_t iv, const QString n) : ELEMENT(TO_HOLDER, iv){
+        name = n;
+        //qDebug() << name;
+    }
 
     std::vector<CARD*> giveCard();
 
@@ -69,7 +81,7 @@ public:
     void showMinTrump();
 
     //перенести в FOOL_PLAYER_SET_VIEW
-    void initSetView(QPointF, int, int);
+    void initSetView(FOOL_PLAYER_SET_VIEW*);
 
     //только добавление в my_set,
     //остальное перенести в FOOL_PLAYER_SET_VIEW
@@ -82,13 +94,19 @@ public:
     void changeState();
 
     //перенести в FOOL_PLAYER_SET_VIEW и передавать PLAYER_STATE
-    void customizeButtons();
+    //void customizeButtons();
 
 
 public slots:
-    void changeCard(Qt::MouseButton);
+    void changeCard(CARD*);
 
     void changeMoveValue();
+
+    //потом сигнал понадобится для графического отображения сигнала об ошибке!
+    //void iMistake();
+
+//friend class FOOL_PLAYER_SET_VIEW;
+
 };
 
 #endif // PLAYER_H
