@@ -9,10 +9,10 @@ int main(int argc, char *argv[])
   QApplication a(argc, argv);
 
   FOOL_GAME fool;
-  SCENE_VIEW game_scene(&fool);
-  fool.init();
+  FOOL_ITEM_MANAGER manager;
+  SCENE_VIEW game_scene(&manager);
 
-  //game_scene.setItems(fool.getItems());
+  fool.init(&manager);
   fool.game();
   game_scene.show();  
 

@@ -86,26 +86,23 @@ FOOL_RULES::END_LOCAL_STATE FOOL_RULES::isEndLocal(){
 void FOOL_RULES::checkGameOver(){
     FOOL_PLAYER *active =  pl1->my_move ? pl1 : pl2,
                *passive = !pl1->my_move ? pl1 : pl2;
-    QString message;
+    QString message = "game over:\n";
 
     if (active->getVolume() == 0 && passive->getVolume() == 0)
-        message = "dead heat";
+        message += "dead heat";
 
     else if (active->getVolume() == 0){
-        message = active->name;
+        message += active->name;
         message += " wins";
     }
 
     else if (passive->getVolume() == 0){
-        message = active->name;
+        message += active->name;
         message += " wins";
     }
-
 
     else
         return;
 
-    field->f_f_set_view->text = "game  over:\n";
-    field->f_f_set_view->text += message;
-    field->f_f_set_view->update();
+    emit gameOver(message);
 }

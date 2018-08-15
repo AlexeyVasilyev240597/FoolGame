@@ -6,36 +6,28 @@
 
 
 //-----------------------------------------GAME-----------------------------------------
-void FOOL_GAME::init(){
+
+void FOOL_GAME::init(FOOL_ITEM_MANAGER *manager){
+
     dealer = new DEALER(_36_CARD_DECK);
 
     pl1 = new FOOL_PLAYER(PLAYER_VOLUME_INIT, "user#1");
-    pl1_item = new FOOL_PLAYER_SET_VIEW(QPointF(240, 495), 80 * PLAYER_VOLUME_INIT + 40/*for buttons*/, 145/*116*1.25*/);
-    pl1->initSetView(pl1_item);
-    //pl1->initSetView(QPointF(240, 495), 80 * PLAYER_VOLUME_INIT + 40/*for buttons*/, 145/*116*1.25*/);
-    //pl1->pl_set_view->setPlayer(pl1);
-    emit addElem(pl1_item);
+    manager->createItem(pl1, 1);
 
     pl2 = new FOOL_PLAYER(PLAYER_VOLUME_INIT, "user#2");
-    pl2_item = new FOOL_PLAYER_SET_VIEW(QPointF(240, 0), 80 * PLAYER_VOLUME_INIT + 40, 145);
-    pl2->initSetView(pl2_item);
-    //pl2->pl_set_view->setPlayer(pl2);
-    emit addElem(pl2_item);
+    manager->createItem(pl2, 2);
 
     pr = new FOOL_PRICUP(_36_CARD_DECK - PLAYER_VOLUME_INIT - PLAYER_VOLUME_INIT);
-    pr_item = new FOOL_PRICUP_SET_VIEW(QPointF(0, 262), 116, 116);
-    pr->initSetView(pr_item);
-    emit addElem(pr_item);
+    manager->createItem(pr);
 
     field = new FOOL_FIGHT_FIELD();
-    f_item = new FOOL_FIGHT_FIELD_SET_VIEW(QPointF(300, 150), 360, 290);
-    field->initSetView(f_item);
-    emit addElem(f_item);
+    manager->createItem(field);
 
     beaten = new FOOL_BEATEN();
-    b_item = new FOOL_BEATEN_SET_VIEW(QPointF(880, 262), 80, 116);
-    beaten->initSetView(b_item);
-    emit addElem(b_item);
+    manager->createItem(beaten);
+
+    QObject::connect(this, &FOOL_GAME::gameOver,
+                     manager->f_item, &FOOL_FIGHT_FIELD_SET_VIEW::drawMessage);
 }
 /*
 FOOL_GAME::~FOOL_GAME(){
@@ -75,7 +67,6 @@ void FOOL_GAME::fillSetsOfPlayers()
                                 pr->getVolume())));
     checkGameOver();
 }
-
 
 void FOOL_GAME::game()
 {
@@ -222,3 +213,81 @@ std::vector<MY_ITEM*> FOOL_GAME:: getItems(){
     return items;
 }
 */
+
+//-----------------------------------------ITEM_MANAGER-----------------------------------------
+
+void FOOL_ITEM_MANAGER::createItem(FOOL_PLAYER *player, size_t num){
+    FOOL_PLAYER_SET_VIEW *pl_item = new FOOL_PLAYER_SET_VIEW(QPointF(240, 495 * !(num - 1)),
+                                                             80 * PLAYER_VOLUME_INIT + 40/*for buttons*/,
+                                                             145/*116*1.25*/);
+
+    QObject::connect(player, &FOOL_PLAYER::addedToSet,
+                     pl_item, &FOOL_PLAYER_SET_VIEW::addToMap);
+
+    QObject::connect(player, &FOOL_PLAYER::removedFromSet,
+                     pl_item, &FOOL_PLAYER_SET_VIEW::removeFromMap);
+
+
+    QObject::connect(pl_item, &FOOL_PLAYER_SET_VIEW::choosedCard,
+                     player, &FOOL_PLAYER::changeCard);
+
+    QObject::connect(pl_item->itIsBeaten, &BUTTON::buttonClicked,
+                     player, &FOOL_PLAYER::itIsBeaten);
+
+    QObject::connect(pl_item->iTake, &BUTTON::buttonClicked,
+                     player, &FOOL_PLAYER::iTakeIt);
+
+    QObject::connect(pl_item->takeAway, &BUTTON::buttonClicked,
+                     player, &FOOL_PLAYER::takeAway);
+
+    /*потом конект понадобится для графического отображения сигнала об ошибке!
+    QObject::connect(player, &FOOL_PLAYER::choosedWrongCard,
+                     pl_item, &FOOL_PLAYER_SET_VIEW::changeCardState);
+    */
+
+    QObject::connect(player, &FOOL_PLAYER::customizeButtons,
+                     pl_item, &FOOL_PLAYER_SET_VIEW::customizeButtons);
+
+    emit addElem(pl_item);
+
+    if (num == 1)
+        pl1_item = pl_item;
+
+    else if (num == 2)
+        pl2_item = pl_item;
+}
+
+void FOOL_ITEM_MANAGER::createItem(FOOL_PRICUP *pricup){
+    pr_item = new FOOL_PRICUP_SET_VIEW(QPointF(0, 262), 116, 116);
+
+    QObject::connect(pricup, &FOOL_PRICUP::addedToSet,
+                     pr_item, &FOOL_PRICUP_SET_VIEW::gaveOut);
+
+
+    QObject::connect(pricup, &FOOL_PRICUP::removedFromSet,
+                     pr_item, &FOOL_PRICUP_SET_VIEW::removeFromPile);
+
+    emit addElem(pr_item);
+
+}
+
+void FOOL_ITEM_MANAGER::createItem(FOOL_FIGHT_FIELD *field){
+    f_item = new FOOL_FIGHT_FIELD_SET_VIEW(QPointF(300, 150), 360, 290);
+
+    QObject::connect(field, &FOOL_FIGHT_FIELD::addedToSet,
+                     f_item, &FOOL_FIGHT_FIELD_SET_VIEW::addCardItem);
+
+    QObject::connect(field, &FOOL_FIGHT_FIELD::removedFromSet,
+                     f_item, &FOOL_FIGHT_FIELD_SET_VIEW::removeAllItems);
+
+    emit addElem(f_item);
+}
+
+void FOOL_ITEM_MANAGER::createItem(FOOL_BEATEN *beaten){
+    b_item = new FOOL_BEATEN_SET_VIEW(QPointF(880, 262), 80, 116);
+
+    QObject::connect(beaten, &FOOL_BEATEN::addedToSet,
+                     b_item, &FOOL_BEATEN_SET_VIEW::firstAdded);
+
+    emit addElem(b_item);
+}

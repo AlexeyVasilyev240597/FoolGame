@@ -14,9 +14,8 @@ std::vector<CARD*> FOOL_PRICUP::giveCard(size_t number){
 	}
 
     emit removedFromSet(my_set.size());
-    //qDebug() << "in Pricup " << this->getVolume() <<"cards";
 
-	return cards;
+    return cards;
 }
 
 void FOOL_PRICUP::dealerGaveOut(){
@@ -28,44 +27,8 @@ void FOOL_PRICUP::dealerGaveOut(){
     }
 }
 
-
-void FOOL_PRICUP::initSetView(FOOL_PRICUP_SET_VIEW* pr_set_view){
-    //pr_set_view = new FOOL_PRICUP_SET_VIEW(pos, w, h);
-
-    QObject::connect(this, &FOOL_PRICUP::addedToSet,
-                     pr_set_view, &FOOL_PRICUP_SET_VIEW::gaveOut);
-
-
-    QObject::connect(this, &FOOL_PRICUP::removedFromSet,
-                     pr_set_view, &FOOL_PRICUP_SET_VIEW::removeFromPile);
-
-}
-
-
-//-----------------------------BEATEN-----------------------------
-void FOOL_BEATEN::addToSet(std::vector<CARD*> cards){
-    for (size_t i = 0; i < cards.size(); i++){
-        if (my_set.empty())
-            emit addedToSet();
-        my_set.push_back(cards[i]);
-        my_set.back()->changeFaceState(DOWN);        
-    }
-
-    //qDebug() << "in Beaten " << this->getVolume() <<"cards";
-}
-
-std::vector<CARD*> FOOL_BEATEN::giveCard(){
-    //beaten НЕ ОТДАЕТ карты
-    std::vector<CARD*> cards;
-	return cards;
-}
-
-void FOOL_BEATEN::initSetView(FOOL_BEATEN_SET_VIEW *b_set_view){
-    QObject::connect(this, &FOOL_BEATEN::addedToSet,
-                     b_set_view, &FOOL_BEATEN_SET_VIEW::firstAdded);
-}
-
 //-----------------------------FIELD-----------------------------
+
 void FOOL_FIGHT_FIELD::addToSet(std::vector<CARD*> cards, FOOL_PLAYER::PLAYER_STATE s){
     my_set.push_back(cards[0]);
     my_set.back()->changeFaceState(UP);
@@ -74,15 +37,11 @@ void FOOL_FIGHT_FIELD::addToSet(std::vector<CARD*> cards, FOOL_PLAYER::PLAYER_ST
     if (s == FOOL_PLAYER::ATTACK || s == FOOL_PLAYER::ADDING){
         counter[FROM_ATTAKING]++;
         index = counter[FROM_ATTAKING];
-        //x = 80 * 1.5 * ((index - 1) % 3);
-        //y = 116 * 1.25 * (index > 3);
     }
 
     if (s == FOOL_PLAYER::DEFENCE || s == FOOL_PLAYER::TAKING){
         counter[FROM_DEFENCING]++;
         index = counter[FROM_DEFENCING];
-        //x = 80 / 2 + 80 * 1.5 * ((index - 1) % 3);
-        //y = 116 * 0.25 + 116 * 1.25 * (index > 3);
     }
 
     emit addedToSet(my_set.back(),
@@ -104,15 +63,27 @@ std::vector<CARD*> FOOL_FIGHT_FIELD::giveCard(){
     return cards;
 }
 
-void FOOL_FIGHT_FIELD::initSetView(FOOL_FIGHT_FIELD_SET_VIEW *f_f_set_view){
-    QObject::connect(this, &FOOL_FIGHT_FIELD::addedToSet,
-                     f_f_set_view, &FOOL_FIGHT_FIELD_SET_VIEW::addCardItem);
+//-----------------------------BEATEN-----------------------------
 
-    QObject::connect(this, &FOOL_FIGHT_FIELD::removedFromSet,
-                     f_f_set_view, &FOOL_FIGHT_FIELD_SET_VIEW::removeAllItems);
+void FOOL_BEATEN::addToSet(std::vector<CARD*> cards){
+    for (size_t i = 0; i < cards.size(); i++){
+        if (my_set.empty())
+            emit addedToSet();
+        my_set.push_back(cards[i]);
+        my_set.back()->changeFaceState(DOWN);
+    }
+
+    //qDebug() << "in Beaten " << this->getVolume() <<"cards";
+}
+
+std::vector<CARD*> FOOL_BEATEN::giveCard(){
+    //beaten НЕ ОТДАЕТ карты
+    std::vector<CARD*> cards;
+    return cards;
 }
 
 //-----------------------------DEALER-----------------------------
+
 void DEALER::giveOutCards(ELEMENT* elem){
 
     if (elem->getInitVolume() == 0)
@@ -139,6 +110,8 @@ void DEALER::giveOutCards(ELEMENT* elem){
 
     elem->addToSet(tmp_set);
 }
+
+//в этом месте можно связать сигналы элементов и слоты итомов
 /*
 void DEALER::exchange(ELEMENT* from, ELEMENT* to){
     //if (rules->isPossible(from, to))

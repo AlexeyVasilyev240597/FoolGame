@@ -34,22 +34,6 @@ void CARD_BTN::mouseReleaseEvent(QGraphicsSceneMouseEvent */*apEvent*/)
     emit cardButtonClicked(my_card);
 }
 
-//-----------------------------FIGHT-FIELD-----------------------------
-
-void FOOL_FIGHT_FIELD_SET_VIEW::paint(QPainter *painter,
-                                      const QStyleOptionGraphicsItem* /*option*/,
-                                      QWidget* /*widget*/){
-  if (!text.isEmpty()){
-      QFont font = painter->font();
-      font.setPointSize(font.pointSize() * 5);
-      painter->setFont(font);
-      painter->drawText(QRectF(0, 0, mWidth, mHeigth), Qt::AlignCenter, text);
-  }
-
-  painter->drawRoundedRect(0, 0, mWidth, mHeigth, 5, 5);
-}
-
-
 //-----------------------------PLAYER-----------------------------
 QPointF FOOL_PLAYER_SET_VIEW::getMyPos(size_t index, size_t n){
     qreal x, y;
@@ -163,6 +147,20 @@ void FOOL_BEATEN_SET_VIEW::firstAdded(){
 }
 
 //-----------------------------FIELD-----------------------------
+void FOOL_FIGHT_FIELD_SET_VIEW::paint(QPainter *painter,
+                                      const QStyleOptionGraphicsItem* /*option*/,
+                                      QWidget* /*widget*/){
+  if (!text.isEmpty()){
+      QFont font = painter->font();
+      font.setPointSize(font.pointSize() * 3);
+      painter->setFont(font);
+      painter->drawText(QRectF(0, 0, mWidth, mHeigth), Qt::AlignCenter, text);
+  }
+
+  painter->drawRoundedRect(0, 0, mWidth, mHeigth, 5, 5);
+}
+
+
 QPointF FOOL_FIGHT_FIELD_SET_VIEW::getMyPos(bool inAttack, size_t index){
     qreal x, y;
 
@@ -199,4 +197,9 @@ void FOOL_FIGHT_FIELD_SET_VIEW::removeAllItems(){
         delete cards_in_fight[i];
 
     cards_in_fight.clear();
+}
+
+void FOOL_FIGHT_FIELD_SET_VIEW::drawMessage(QString message){
+    text = message;
+    update();
 }

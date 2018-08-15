@@ -23,8 +23,6 @@ public:
 
     std::vector<CARD*> giveCard(size_t number);
 
-    void initSetView(FOOL_PRICUP_SET_VIEW*);
-
 signals:
     void getTrumpSuit(SUIT);
 
@@ -37,31 +35,10 @@ public slots:
 };
 
 
-class FOOL_BEATEN : public QObject, public ELEMENT{
-Q_OBJECT
-public:
-    FOOL_BEATEN():ELEMENT(TO_NOONE, 0){}
-
-    FOOL_BEATEN_SET_VIEW *b_set_view;
-
-    std::vector<CARD*> giveCard();
-
-    //void initSetView(QPointF pos, int w, int h);
-
-    void addToSet(std::vector<CARD*> cards);
-
-    void initSetView(FOOL_BEATEN_SET_VIEW*);
-
-signals:
-    void addedToSet();
-};
-
 
 class FOOL_FIGHT_FIELD : public QObject, public ELEMENT{
 Q_OBJECT
 public:
-    FOOL_FIGHT_FIELD_SET_VIEW *f_f_set_view;
-
     enum CARD_STATE_ON_FIELD{FROM_ATTAKING, FROM_DEFENCING};
     std::map<CARD_STATE_ON_FIELD, size_t> counter;
 
@@ -74,16 +51,30 @@ public:
 
     std::vector<CARD*> giveCard();
 
-    void initSetView(FOOL_FIGHT_FIELD_SET_VIEW*);
-
     void addToSet(std::vector<CARD*> cards, FOOL_PLAYER::PLAYER_STATE s);
 
     //void itemsUpdate();
 
-signals:    
+signals:
     void addedToSet(CARD*, bool, size_t);
 
     void removedFromSet();
+};
+
+
+class FOOL_BEATEN : public QObject, public ELEMENT{
+Q_OBJECT
+public:
+    FOOL_BEATEN():ELEMENT(TO_NOONE, 0){}
+
+    std::vector<CARD*> giveCard();
+
+    //void initSetView(QPointF pos, int w, int h);
+
+    void addToSet(std::vector<CARD*> cards);
+
+signals:
+    void addedToSet();
 };
 
 /*

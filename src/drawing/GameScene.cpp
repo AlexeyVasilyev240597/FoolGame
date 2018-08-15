@@ -4,9 +4,9 @@
 #include "../fool/Table.h"
 #include <QObject>
 
-SCENE_VIEW::SCENE_VIEW(FOOL_GAME *game)
+SCENE_VIEW::SCENE_VIEW(FOOL_ITEM_MANAGER *manager)
 {
-    QObject::connect(game, &FOOL_GAME::addElem,
+    QObject::connect(manager, &FOOL_ITEM_MANAGER::addElem,
                      this, &SCENE_VIEW::addItem);
 
    //пройдись по ним и посмотри, что убрать

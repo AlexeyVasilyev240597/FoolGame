@@ -13,36 +13,6 @@ void FOOL_PLAYER::addToSet(std::vector<CARD*> cards)
     emit addedToSet(my_set);
 }
 
-void FOOL_PLAYER::initSetView(FOOL_PLAYER_SET_VIEW *pl_set_view){
-
-QObject::connect(this, &FOOL_PLAYER::addedToSet,
-                 pl_set_view, &FOOL_PLAYER_SET_VIEW::addToMap);
-
-QObject::connect(this, &FOOL_PLAYER::removedFromSet,
-                 pl_set_view, &FOOL_PLAYER_SET_VIEW::removeFromMap);
-
-
-QObject::connect(pl_set_view, &FOOL_PLAYER_SET_VIEW::choosedCard,
-                 this, &FOOL_PLAYER::changeCard);
-
-QObject::connect(pl_set_view->itIsBeaten, &BUTTON::buttonClicked,
-                 this, &FOOL_PLAYER::itIsBeaten);
-
-QObject::connect(pl_set_view->iTake, &BUTTON::buttonClicked,
-                 this, &FOOL_PLAYER::iTakeIt);
-
-QObject::connect(pl_set_view->takeAway, &BUTTON::buttonClicked,
-                 this, &FOOL_PLAYER::takeAway);
-
-/*потом конект понадобится для графического отображения сигнала об ошибке!
-QObject::connect(this, &FOOL_PLAYER::choosedWrongCard,
-                 pl_set_view, &FOOL_PLAYER_SET_VIEW::changeCardState);
-*/
-
-QObject::connect(this, &FOOL_PLAYER::customizeButtons,
-                 pl_set_view, &FOOL_PLAYER_SET_VIEW::customizeButtons);
-}
-
 std::vector<CARD*> FOOL_PLAYER::giveCard(){
     //palyer ходит ПО ОДНОЙ карте
     std::vector<CARD*> cards;

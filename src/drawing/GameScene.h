@@ -15,7 +15,7 @@ class SCENE_VIEW : public QGraphicsView
 {
 public:
     //будет какой-нибудь connector, чтобы сцена не лазила по внутренностям игры
-  SCENE_VIEW(FOOL_GAME *game);
+  SCENE_VIEW(FOOL_ITEM_MANAGER *manager);
 public slots:
     void addItem(MY_ITEM* item);
 

@@ -35,6 +35,7 @@ protected:
 
 signals:
     void transferMove();
+    void gameOver(QString message);
 
 public slots:
     void setTrump(SUIT t){trump = t;}

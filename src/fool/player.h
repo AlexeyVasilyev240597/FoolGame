@@ -65,12 +65,7 @@ public:
 
     void showMinTrump();
 
-    //это будет делать класс, находящийся повыше в иерархии,
-    //убрать, когда все elems будут разделены со своими items
-    void initSetView(FOOL_PLAYER_SET_VIEW*);
-
     //только добавление в my_set,
-    //остальное перенести в FOOL_PLAYER_SET_VIEW
     void addToSet(std::vector<CARD*> cards);
 
     void initState(PLAYER_STATE s);

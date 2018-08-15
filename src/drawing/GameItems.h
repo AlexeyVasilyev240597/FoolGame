@@ -113,6 +113,8 @@ public slots:
     void addCardItem(CARD*, bool, size_t);
 
     void removeAllItems();
+
+    void drawMessage(QString message);
 };
 
 
