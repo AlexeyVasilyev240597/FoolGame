@@ -1,13 +1,27 @@
 #include <QObject>
 #include "Player.h"
 
+inline size_t getWeight(CARD *c, SUIT trump){
+    return (int)ACE * (c->getSuit() == trump) + c->getRank();
+}
+
 void FOOL_PLAYER::addToSet(std::vector<CARD*> cards)
 {
     for (size_t i = 0; i < cards.size(); i++){
-        my_set.push_back(cards[i]);
-        //можно искать место для вставки здесь
-        //и не использовать сложную сортировку
-        my_set.back()->changeFaceState(UP);//is_user ? UP : DOWN);
+        cards[i]->changeFaceState(TO_US);
+
+        size_t insert_card_weight = getWeight(cards[i], trump);
+        bool card_was_inserted = false;
+        for (std::vector<CARD*>::iterator it = my_set.begin(); it != my_set.end(); it++){
+            size_t cur_card_weigth = getWeight((*it), trump);
+            if (insert_card_weight <= cur_card_weigth){
+                my_set.insert(it, cards[i]);
+                card_was_inserted = true;
+                break;
+            }
+        }
+        if (!card_was_inserted)
+            my_set.push_back(cards[i]);
     }
 
     emit addedToSet(my_set);
@@ -18,23 +32,21 @@ std::vector<CARD*> FOOL_PLAYER::giveCard(){
     std::vector<CARD*> cards;
 
     cards.push_back(choosed_card);
-    for (size_t i = 0; i < my_set.size(); i++)
-        if (my_set[i] == choosed_card){
-            std::swap(my_set[i], my_set[0]);
-            my_set.erase(my_set.begin());
+    for (std::vector<CARD*>::iterator it = my_set.begin(); it != my_set.end(); it++)
+        if ((*it) == choosed_card){
+            my_set.erase(it);
             break;
         }
-
     choosed_card = NULL;
 
-    emit removedFromSet(cards);
+    emit removedFromSet(my_set, cards);
 
     return cards;
 }
 
 void FOOL_PLAYER::changeCard(CARD* card){
     choosed_card = card;
-    //qDebug() << changed_card->getSuit() << changed_card->getRank();
+
     emit chooseIsMade();
 }
 
@@ -54,7 +66,6 @@ void FOOL_PLAYER::initState(PLAYER_STATE s){
 }
 
 void FOOL_PLAYER::changeState(){
-    //=== state = state == ATTACK || state == TAKING ? DEFENCE : ATTACK;
     switch (state){
     case ATTACK:
         state = DEFENCE;
@@ -91,25 +102,5 @@ void FOOL_PLAYER::changeMoveValue(){
 void FOOL_PLAYER::iMistake(){
     emit choosedWrongCard(choosed_card);
     choosed_card = NULL;
-}
-*/
-/*
-void FOOL_PLAYER::sortSet(){
-    for (size_t i = 0; i < my_set.size() - 1; i++)
-        for (size_t j = i + 1; j < my_set.size(); j++){
-            int s[2] = {my_set[i]->getSuit() == trump ? (int)my_set[i]->getSuit() + 5 : (int)my_set[i]->getSuit(),
-                        my_set[j]->getSuit() == trump ? (int)my_set[j]->getSuit() + 5 : (int)my_set[j]->getSuit()};
-            if (s[0] > s[1])
-                std::swap(my_set[i], my_set[j]);
-        }
-
-    size_t i = 0;
-    for (int s = DIAMONDS; s <= SPADES; s++){
-        for (; my_set[i]->getSuit() == s && i < my_set.size(); i++)
-            for (size_t j = i; my_set[j]->getSuit() == s && j < my_set.size(); j++)
-                if ((int)my_set[i]->getRank() > (int)my_set[j]->getRank())
-                    std::swap(my_set[i], my_set[j]);
-        qDebug() << my_set[i]->getRank() << my_set[i]->getSuit();
-    }
 }
 */

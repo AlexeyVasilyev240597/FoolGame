@@ -76,13 +76,15 @@ void FOOL_GAME::game()
     QObject::connect(pr, &FOOL_PRICUP::getTrumpSuit,
                      this, &FOOL_GAME::setTrump);
 
-    dealer->giveOutCards(pl1);
-    dealer->giveOutCards(pl2);
     dealer->giveOutCards(pr);
     emit dealer->iGaveOut();
 
-    //pl1->setTrump(trump);
-    //pl2->setTrump(trump);
+
+    pl1->setTrump(trump);
+    pl2->setTrump(trump);
+
+    dealer->giveOutCards(pl1);
+    dealer->giveOutCards(pl2);
 
     pl1->initState(FOOL_PLAYER::ATTACK);
     //active = pl1;

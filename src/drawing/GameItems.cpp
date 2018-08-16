@@ -67,7 +67,7 @@ void FOOL_PLAYER_SET_VIEW::addToMap(std::vector<CARD*> &set)
                 card_btns.end()){
 
             CARD_BTN* c_b = new CARD_BTN(getMyPos(i, set.size()), set[i]);
-            card_btns.insert(std::pair<CARD*, CARD_BTN*>(set[i], c_b));
+            card_btns.insert(card_btns.end(), std::pair<CARD*, CARD_BTN*>(set[i], c_b));
 
             card_btns.at(set[i])->setParentItem(this);
             QObject::connect(card_btns.at(set[i]), &CARD_BTN::cardButtonClicked,
@@ -81,21 +81,17 @@ void FOOL_PLAYER_SET_VIEW::addToMap(std::vector<CARD*> &set)
     }
 }
 
-void FOOL_PLAYER_SET_VIEW::removeFromMap(std::vector<CARD*> &cards)
+void FOOL_PLAYER_SET_VIEW::removeFromMap(std::vector<CARD*>& set, std::vector<CARD*>& cards_to_remove)
 {
-    for (size_t i = 0; i < cards.size(); i++){
-        delete card_btns.at(cards[i]);
-        card_btns.erase(cards[i]);
+    for (size_t i = 0; i < cards_to_remove.size(); i++){
+        delete card_btns.at(cards_to_remove[i]);
+        card_btns.erase(cards_to_remove[i]);
     }
 
-    size_t index = 0;
-    for (std::map<CARD*, CARD_BTN*>::iterator it = card_btns.begin();
-         it != card_btns.end();
-         it++, index++){
-
-        it->second->setPos(getMyPos(index, card_btns.size()));
-        it->second->setZValue(index + 1);
-     }
+    for (size_t i = 0; i < set.size(); i++){
+       card_btns.at(set[i])->setPos(getMyPos(i, set.size()));
+       card_btns.at(set[i])->setZValue(i + 1);
+    }
 }
 
 void FOOL_PLAYER_SET_VIEW::clickedCard(CARD* card)

@@ -68,9 +68,9 @@ signals:
     void choosedCard(CARD*);
 
 public slots:
-    void addToMap(std::vector<CARD*>&);
+    void addToMap(std::vector<CARD*>& set);
 
-    void removeFromMap(std::vector<CARD*>&);
+    void removeFromMap(std::vector<CARD*>& set, std::vector<CARD*>& cards_to_remove);
 
     void clickedCard(CARD*);
 

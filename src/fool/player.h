@@ -33,9 +33,9 @@ public:
         enum PLAYER_STATE{ATTACK, DEFENCE, ADDING, TAKING, NO_DEF} state{NO_DEF};
 
 signals:
-    void addedToSet(std::vector<CARD*>&);
+    void addedToSet(std::vector<CARD*>& set);
 
-    void removedFromSet(std::vector<CARD*>&);
+    void removedFromSet(std::vector<CARD*>& set, std::vector<CARD*>& cards_to_remove);
 
     void chooseIsMade();
 
