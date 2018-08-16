@@ -11,13 +11,13 @@ void FOOL_GAME::init(FOOL_ITEM_MANAGER *manager){
 
     dealer = new DEALER(_36_CARD_DECK);
 
-    pl1 = new FOOL_PLAYER(PLAYER_VOLUME_INIT, "user#1");
+    pl1 = new FOOL_PLAYER(PL_V/*PLAYER_VOLUME_INIT*/, "user#1");
     manager->createItem(pl1, 1);
 
-    pl2 = new FOOL_PLAYER(PLAYER_VOLUME_INIT, "user#2");
+    pl2 = new FOOL_PLAYER(PL_V/*PLAYER_VOLUME_INIT*/, "user#2");
     manager->createItem(pl2, 2);
 
-    pr = new FOOL_PRICUP(_36_CARD_DECK - PLAYER_VOLUME_INIT - PLAYER_VOLUME_INIT);
+    pr = new FOOL_PRICUP(PR_V);//_36_CARD_DECK - PLAYER_VOLUME_INIT - PLAYER_VOLUME_INIT);
     manager->createItem(pr);
 
     field = new FOOL_FIGHT_FIELD();
@@ -51,7 +51,7 @@ void FOOL_GAME::fillSetsOfPlayers()
                 *last  = pl1->state == FOOL_PLAYER::DEFENCE|| pl1->state == FOOL_PLAYER::TAKING ? pl1 : pl2;
 
     if (pr->getVolume())
-        if (first->getVolume() < first->getInitVolume())
+        if (first->getVolume() < PL_V/*first->getInitVolume()*/)
             first->addToSet(
                         pr->giveCard(
                             std::min(
@@ -59,7 +59,7 @@ void FOOL_GAME::fillSetsOfPlayers()
                                 pr->getVolume())));
 
     if (pr->getVolume())
-        if (last->getVolume() < last->getInitVolume())
+        if (last->getVolume() < PL_V/*last->getInitVolume()*/)
             last->addToSet(
                         pr->giveCard(
                             std::min(
@@ -218,7 +218,7 @@ std::vector<MY_ITEM*> FOOL_GAME:: getItems(){
 
 void FOOL_ITEM_MANAGER::createItem(FOOL_PLAYER *player, size_t num){
     FOOL_PLAYER_SET_VIEW *pl_item = new FOOL_PLAYER_SET_VIEW(QPointF(240, 495 * !(num - 1)),
-                                                             80 * PLAYER_VOLUME_INIT + 40/*for buttons*/,
+                                                             80 * player->getInitVolume() + 40/*for buttons*/,
                                                              145/*116*1.25*/);
 
     QObject::connect(player, &FOOL_PLAYER::addedToSet,

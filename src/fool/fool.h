@@ -35,7 +35,6 @@ public:
 
     void init(FOOL_ITEM_MANAGER*);
     void game();
-    //std::vector<MY_ITEM*> getItems();
     void endLocalFight();
     void fillSetsOfPlayers();
 

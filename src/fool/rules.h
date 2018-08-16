@@ -8,11 +8,16 @@
 #include "Player.h"
 
 //later will be in RULES
-#define PLAYER_VOLUME_INIT 6
+//#define PLAYER_VOLUME_INIT 6
 
+//template<size_t deck_volume, size_t players_number>
 class   FOOL_RULES: public QObject{
 Q_OBJECT
 protected:
+    FOOL_RULES(){}
+
+    enum INIT_VOLUMES{PL_V = 6, PR_V = _36_CARD_DECK - 6 * 2/*deck_volume - 6 * players_number*/};
+
     SUIT trump;
 
     //FOOL_PLAYER *active, *passive;

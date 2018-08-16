@@ -76,7 +76,7 @@ FOOL_RULES::END_LOCAL_STATE FOOL_RULES::isEndLocal(){
         return GIVE_AWAY;
 
     if (active->state == FOOL_PLAYER::DEFENCE &&
-              (field->getVolume() == active->getInitVolume() * 2 ||
+              (field->getVolume() == /*active->getInitVolume()*/PL_V * 2 ||
                active->getVolume() == 0 || passive->getVolume() == 0))
            return BEATEN_OFF;
 

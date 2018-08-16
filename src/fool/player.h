@@ -45,7 +45,8 @@ signals:
 
     void takeAway();
 
-    void choosedWrongCard(CARD*);
+    //потом сигнал понадобится для графического отображения сигнала об ошибке!
+    //void choosedWrongCard(CARD*);
 
     void customizeButtons(bool cards, bool beaten, bool take, bool take_away);
 
@@ -56,7 +57,6 @@ public:
 
     CARD *choosed_card{NULL};       
 
-    //пока не написана getMinTrump(), первым ходит первый игрок
     FOOL_PLAYER(size_t iv, const QString n) : ELEMENT(TO_HOLDER, iv){name = n;}
 
     std::vector<CARD*> giveCard();
@@ -65,7 +65,6 @@ public:
 
     void showMinTrump();
 
-    //только добавление в my_set,
     void addToSet(std::vector<CARD*> cards);
 
     void initState(PLAYER_STATE s);
