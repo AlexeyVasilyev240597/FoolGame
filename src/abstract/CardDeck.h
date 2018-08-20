@@ -1,11 +1,12 @@
 ﻿#define _36_CARD_DECK 36
 #define _52_CARD_DECK 52
-#define _52_CARD_DECK_PLUS_JOKERS 54
+//#define _52_CARD_DECK_PLUS_JOKERS 54
 
 #ifndef _CARD_DESK_H
 #define  _CARD_DESK_H
 
 #include <vector>
+#include <map>
 #include <ctime>
 #include <iostream>
 
@@ -93,7 +94,8 @@ class DECK{
 public:
     size_t volume;
 
-    std::vector<CARD> cards;
+    std::vector<CARD> cards;//, suit_badges;
+    std::map<SUIT, CARD*> suit_badges;
 
 	void toMix(){
 		//when RELEASE
@@ -103,19 +105,22 @@ public:
 	}
 
 
-	DECK(int v = _52_CARD_DECK){
+    DECK(size_t v = _52_CARD_DECK){
 		volume = v;
-		for (int s = DIAMONDS; s <= SPADES; s++)
-            for (int r = ((volume == _52_CARD_DECK || volume == _52_CARD_DECK_PLUS_JOKERS) ? TWO : SIX);
+
+        for (int s = DIAMONDS; s <= SPADES; s++){
+            for (int r = ((volume == _52_CARD_DECK /*|| volume == _52_CARD_DECK_PLUS_JOKERS*/) ? TWO : SIX);
 				r <= ACE;
-				r++){
-				CARD c((SUIT)s, (RANK)r);
-				cards.push_back(c);
-			}
+                r++)
+                cards.push_back(CARD((SUIT)s, (RANK)r));
+
+            //suit_badges.push_back(CARD((SUIT)s, NO_RANK));
+            CARD *badge = new CARD((SUIT)s, NO_RANK);
+            suit_badges.insert(std::pair<SUIT, CARD*>((SUIT)s, badge));
+        }
+
         toMix();
 	}
-
-    //friend class DEALER;
 };
 
 #endif //_CARD_DESK_H

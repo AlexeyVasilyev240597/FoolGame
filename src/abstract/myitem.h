@@ -75,11 +75,10 @@ public:
   void mousePressEvent(QGraphicsSceneMouseEvent *)  override;
   void mouseReleaseEvent(QGraphicsSceneMouseEvent *)override;
 
+  QString my_text;
+
 signals:
   void buttonClicked(Qt::MouseButton);
-
-private:
-  QString my_text;
 
 };
 

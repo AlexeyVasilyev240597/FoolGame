@@ -30,13 +30,13 @@ void CARD_BTN::hoverLeaveEvent(QGraphicsSceneHoverEvent*)
 
 void CARD_BTN::mouseReleaseEvent(QGraphicsSceneMouseEvent */*apEvent*/)
 {
-    //isChanged = true;
     emit cardButtonClicked(my_card);
 }
 
 //-----------------------------PLAYER-----------------------------
 QPointF FOOL_PLAYER_SET_VIEW::getMyPos(size_t index, size_t n){
     qreal x, y;
+
     if (n < 19){
         x = n <= 6 ?
                     80 * (3 - (qreal)n / 2 + index) :    //выравнивание по центру
@@ -44,17 +44,18 @@ QPointF FOOL_PLAYER_SET_VIEW::getMyPos(size_t index, size_t n){
     }
 
     else{
-        if (index < 19)
+        if (index < 18)
             x = (qreal)80 * 5 * index / (18 - 1);
 
         else
             x = n % 19 <= 6 ?
-                        80 * (3 - (qreal)(n % 19) / 2 + index % 19) :
-                 (qreal)80 * 5 * (index % 19) / (n % 19 - 1);
+                        80 * (3 - (qreal)(n % 19) / 2 + index % 19) : //какая-то ебанина в этой строчке, просто пиздец, я не понимаю
+                 (qreal)80 * 5 * (index % 18) / (n % 19 - 1);
      }
 
     y =  116 / 4 * (index >= _36_CARD_DECK / 2);                       //второй ряд карт
 
+    //qDebug() << x << y;
     return QPoint(x, y);
 }
 
@@ -77,7 +78,6 @@ void FOOL_PLAYER_SET_VIEW::addToMap(std::vector<CARD*> &set)
             card_btns.at(set[i])->setPos(getMyPos(i, set.size()));
 
         card_btns.at(set[i])->setZValue(i + 1);
-        //qDebug() << my_set[i]->getRank() << my_set[i]->getSuit();
     }
 }
 
@@ -109,15 +109,9 @@ void FOOL_PLAYER_SET_VIEW::customizeButtons(bool cards, bool beaten, bool take, 
     iTake->setVisible(take);
     takeAway->setVisible(take_away);
 }
-/*
-void FOOL_PLAYER_SET_VIEW::changeCardState(CARD *card){
-    //card_btns.at(card)->isChanged = false;
-    qDebug() << "i in fool player set view change card state";
-}
-*/
 
 //-----------------------------PRICUP-----------------------------
-void FOOL_PRICUP_SET_VIEW::gaveOut(CARD* last_card){
+void FOOL_PRICUP_SET_VIEW::gaveOut(size_t init_volume, CARD *last_card, CARD *tr_badge){
     trumpImg = new CARD_ITEM(QPointF(18, 0), last_card);
     trumpImg->setParentItem(this);
     trumpImg->setTransformOriginPoint(trumpImg->mWidth/2, trumpImg->mHeigth/2);
@@ -125,14 +119,28 @@ void FOOL_PRICUP_SET_VIEW::gaveOut(CARD* last_card){
 
     pileImg = new CARD_ITEM(QPointF(0, 0));
     pileImg->setParentItem(this);
+
+    volume = new BUTTON(QPointF(80/2 - 38/2, 116/2 - 38/2), QString::number(init_volume));
+    volume->setParentItem(this);
+
+    trumpBadge = new CARD_ITEM(QPointF(80/2 - 38/2, 116/2 - 38/2), tr_badge);
+    trumpBadge->setParentItem(this);
+    trumpBadge->setVisible(false);
 }
 
 void FOOL_PRICUP_SET_VIEW::removeFromPile(size_t size){
-    if (size <= 1)
-        pileImg->setVisible(false);
+    volume->my_text = QString::number(size);
+    volume->update();
 
-    if (size == 0)
+    if (size <= 1){
+        pileImg->setVisible(false);
+        volume->setVisible(false);
+    }
+
+    if (size == 0){
         trumpImg->setVisible(false);
+        trumpBadge->setVisible(true);
+    }
 }
 
 //-----------------------------BEATEN-----------------------------
@@ -160,19 +168,12 @@ void FOOL_FIGHT_FIELD_SET_VIEW::paint(QPainter *painter,
 QPointF FOOL_FIGHT_FIELD_SET_VIEW::getMyPos(bool inAttack, size_t index){
     qreal x, y;
 
-    //if (s == FOOL_PLAYER::ATTACK || s == FOOL_PLAYER::ADDING){
     if (inAttack){
-        //counter[FROM_ATTAKING]++;
-        //size_t index = counter[FROM_ATTAKING];
         x = 80 * 1.5 * ((index - 1) % 3);
         y = 116 * 1.25 * (index > 3);
     }
 
-    //if (s == FOOL_PLAYER::DEFENCE || s == FOOL_PLAYER::TAKING){
     else{
-        //counter[FROM_DEFENCING]++;
-        //size_t index = counter[FROM_DEFENCING];
-        //card_count_from_defencing++;
         x = 80 / 2 + 80 * 1.5 * ((index - 1) % 3);
         y = 116 * 0.25 + 116 * 1.25 * (index > 3);
     }

@@ -2,22 +2,18 @@
 #include "../abstract/gameelement.h"
 #include <QGraphicsItem>
 
-//#define PLAYER_VOLUME_INIT 6
-
-
 //-----------------------------------------GAME-----------------------------------------
-
 void FOOL_GAME::init(FOOL_ITEM_MANAGER *manager){
 
     dealer = new DEALER(_36_CARD_DECK);
 
-    pl1 = new FOOL_PLAYER(PL_V/*PLAYER_VOLUME_INIT*/, "user#1");
+    pl1 = new FOOL_PLAYER(PL_V, "user#1");
     manager->createItem(pl1, 1);
 
-    pl2 = new FOOL_PLAYER(PL_V/*PLAYER_VOLUME_INIT*/, "user#2");
+    pl2 = new FOOL_PLAYER(PL_V, "user#2");
     manager->createItem(pl2, 2);
 
-    pr = new FOOL_PRICUP(PR_V);//_36_CARD_DECK - PLAYER_VOLUME_INIT - PLAYER_VOLUME_INIT);
+    pr = new FOOL_PRICUP(PR_V);
     manager->createItem(pr);
 
     field = new FOOL_FIGHT_FIELD();
@@ -51,7 +47,7 @@ void FOOL_GAME::fillSetsOfPlayers()
                 *last  = pl1->state == FOOL_PLAYER::DEFENCE|| pl1->state == FOOL_PLAYER::TAKING ? pl1 : pl2;
 
     if (pr->getVolume())
-        if (first->getVolume() < PL_V/*first->getInitVolume()*/)
+        if (first->getVolume() < PL_V)
             first->addToSet(
                         pr->giveCard(
                             std::min(
@@ -59,7 +55,7 @@ void FOOL_GAME::fillSetsOfPlayers()
                                 pr->getVolume())));
 
     if (pr->getVolume())
-        if (last->getVolume() < PL_V/*last->getInitVolume()*/)
+        if (last->getVolume() < PL_V)
             last->addToSet(
                         pr->giveCard(
                             std::min(
@@ -70,15 +66,13 @@ void FOOL_GAME::fillSetsOfPlayers()
 
 void FOOL_GAME::game()
 {
-    QObject::connect(dealer, &DEALER::iGaveOut,
-                     pr, &FOOL_PRICUP::dealerGaveOut);
-
     QObject::connect(pr, &FOOL_PRICUP::getTrumpSuit,
                      this, &FOOL_GAME::setTrump);
 
-    dealer->giveOutCards(pr);
-    emit dealer->iGaveOut();
+    dealer->giveOutCards(pr);   
 
+
+    pr->setBadge(dealer->getBadge(trump));
 
     pl1->setTrump(trump);
     pl2->setTrump(trump);
@@ -157,11 +151,12 @@ void FOOL_GAME::playerChoosedCard(){
             break;
         }
     }
-/*потом это место понадобится для графического отображения сигнала об ошибке!
+/*потом это место понадобится для графического отображения сигнала об ошибке!*/
     else{
-        emit wrongMove();
+        qDebug() << "player " << active->name << " thrown wrong card";
+        //emit wrongMove();
     }
-*/
+
 
 }
 
@@ -194,7 +189,6 @@ void FOOL_GAME::giveToPlayer(){
     recipient->addToSet(field->giveCard());
 
     endLocalFight();
-    //emit transferMove();
 }
 
 void FOOL_GAME::endLocalFight(){
@@ -202,22 +196,8 @@ void FOOL_GAME::endLocalFight(){
     pl1->changeState();
     pl2->changeState();
 }
-/*
-std::vector<MY_ITEM*> FOOL_GAME:: getItems(){
-    std::vector<MY_ITEM*> items;
-
-    items.push_back(pl1->pl_set_view);
-    items.push_back(pl2->pl_set_view);
-    items.push_back(pr->pr_set_view);
-    items.push_back(field->f_f_set_view);
-    items.push_back(beaten->b_set_view);
-
-    return items;
-}
-*/
 
 //-----------------------------------------ITEM_MANAGER-----------------------------------------
-
 void FOOL_ITEM_MANAGER::createItem(FOOL_PLAYER *player, size_t num){
     FOOL_PLAYER_SET_VIEW *pl_item = new FOOL_PLAYER_SET_VIEW(QPointF(240, 495 * !(num - 1)),
                                                              80 * player->getInitVolume() + 40/*for buttons*/,

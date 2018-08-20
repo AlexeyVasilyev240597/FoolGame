@@ -49,14 +49,14 @@ class FOOL_PLAYER_SET_VIEW : public QObject, public MY_ITEM
 Q_OBJECT
 public:
     FOOL_PLAYER_SET_VIEW(QPointF pos, int w, int h):MY_ITEM(pos, w, h){
-        itIsBeaten = new BUTTON(QPointF(80*6, 0), "beaten");
+        takeAway = new BUTTON(QPointF(80*6, 0), "take\n away");
+        takeAway->setParentItem(this);
+
+        itIsBeaten = new BUTTON(QPointF(80*6, 39), "beaten");
         itIsBeaten->setParentItem(this);
 
-        iTake = new BUTTON(QPointF(80*6, 39), "take");
+        iTake = new BUTTON(QPointF(80*6, 78), "take");
         iTake->setParentItem(this);
-
-        takeAway = new BUTTON(QPointF(80*6, 78), "take\n away");
-        takeAway->setParentItem(this);
     }
 
     BUTTON *itIsBeaten, *iTake, *takeAway;
@@ -68,6 +68,8 @@ signals:
     void choosedCard(CARD*);
 
 public slots:
+    //если сделать вектор вместо мапа, то можно идти по нему и сравнивать CARD*,
+    //которые инкапсулированы в CARD_BTN
     void addToMap(std::vector<CARD*>& set);
 
     void removeFromMap(std::vector<CARD*>& set, std::vector<CARD*>& cards_to_remove);
@@ -85,14 +87,15 @@ class FOOL_PRICUP_SET_VIEW: public QObject, public MY_ITEM
 {
 Q_OBJECT
 public:
-    FOOL_PRICUP_SET_VIEW(QPointF pos, int w, int h):MY_ITEM(pos, w, h){}
+    FOOL_PRICUP_SET_VIEW(QPointF pos, int w, int h):MY_ITEM(pos, w, h){  }
 
-    CARD_ITEM *pileImg, *trumpImg;
+    CARD_ITEM *pileImg, *trumpImg, *trumpBadge;
+    BUTTON *volume;
 
 public slots:
-    void gaveOut(CARD*);
+    void gaveOut(size_t init_volume, CARD *last_card, CARD *tr_badge);
 
-    void removeFromPile(size_t);
+    void removeFromPile(size_t size);
 };
 
 //-----------------------------FIELD'S ITEM-----------------------------

@@ -46,7 +46,7 @@ public:
     virtual void addToSet(std::vector<CARD*> cards){
         for (size_t i = 0; i < cards.size(); i++){
             my_set.push_back(cards[i]);        
-            my_set.back()->changeFaceState(access != TO_NOONE ? UP : DOWN);
+            my_set.back()->changeFaceState(UP);//access != TO_NOONE ? UP : DOWN);
         }
     }
 

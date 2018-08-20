@@ -7,7 +7,6 @@
 #include <map>
 
 #include "../abstract/CardDeck.h"
-//#include "../abstract/myitem.h"
 #include "../drawing/GameItems.h"
 #include "../abstract/GameElement.h"
 #include "Player.h"
@@ -21,17 +20,21 @@ private:
 public:
 	FOOL_PRICUP(size_t iv):ELEMENT(TO_NOONE, iv){}
 
+    void addToSet(std::vector<CARD*> cards);
+
     std::vector<CARD*> giveCard(size_t number);
+
+    void setBadge(CARD* tr_badge);
 
 signals:
     void getTrumpSuit(SUIT);
 
-    void addedToSet(CARD*);
+    void addedToSet(size_t init_volume, CARD *last_card, CARD *tr_badge);
 
-    void removedFromSet(size_t);
+    void removedFromSet(size_t volume);
 
-public slots:
-    void dealerGaveOut();
+//public slots:
+    //void dealerGaveOut();
 };
 
 
@@ -56,7 +59,7 @@ public:
     //void itemsUpdate();
 
 signals:
-    void addedToSet(CARD*, bool, size_t);
+    void addedToSet(CARD* card, bool inAttack, size_t index);
 
     void removedFromSet();
 };
@@ -105,9 +108,7 @@ public:
 
     void exchange(ELEMENT* from, ELEMENT* to);
 
-signals:
-    void iGaveOut();
-
+    CARD* getBadge(SUIT);
 };
 
 #endif//_TABLE_H

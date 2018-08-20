@@ -1,6 +1,22 @@
 #include "Table.h"
 
 //-----------------------------PRICUP-----------------------------
+void FOOL_PRICUP::addToSet(std::vector<CARD*> cards){
+    for (size_t i = 0; i < cards.size(); i++){
+        my_set.push_back(cards[i]);
+        my_set.back()->changeFaceState(DOWN);
+    }
+
+    my_set.back()->changeFaceState(UP);
+
+    emit getTrumpSuit(my_set.back()->getSuit());
+}
+
+void FOOL_PRICUP::setBadge(CARD *tr_badge){
+    emit addedToSet(my_set.size(), my_set.back(), tr_badge);
+}
+
+
 std::vector<CARD*> FOOL_PRICUP::giveCard(size_t number){
     std::vector<CARD*> cards;
 
@@ -18,17 +34,7 @@ std::vector<CARD*> FOOL_PRICUP::giveCard(size_t number){
     return cards;
 }
 
-void FOOL_PRICUP::dealerGaveOut(){
-    if (!my_set.empty())
-    {
-        my_set.back()->changeFaceState(UP);        
-        emit addedToSet(my_set.back());
-        emit getTrumpSuit(my_set.back()->getSuit());
-    }
-}
-
 //-----------------------------FIELD-----------------------------
-
 void FOOL_FIGHT_FIELD::addToSet(std::vector<CARD*> cards, FOOL_PLAYER::PLAYER_STATE s){
     my_set.push_back(cards[0]);
     my_set.back()->changeFaceState(UP);
@@ -64,7 +70,6 @@ std::vector<CARD*> FOOL_FIGHT_FIELD::giveCard(){
 }
 
 //-----------------------------BEATEN-----------------------------
-
 void FOOL_BEATEN::addToSet(std::vector<CARD*> cards){
     for (size_t i = 0; i < cards.size(); i++){
         if (my_set.empty())
@@ -72,8 +77,6 @@ void FOOL_BEATEN::addToSet(std::vector<CARD*> cards){
         my_set.push_back(cards[i]);
         my_set.back()->changeFaceState(DOWN);
     }
-
-    //qDebug() << "in Beaten " << this->getVolume() <<"cards";
 }
 
 std::vector<CARD*> FOOL_BEATEN::giveCard(){
@@ -83,7 +86,6 @@ std::vector<CARD*> FOOL_BEATEN::giveCard(){
 }
 
 //-----------------------------DEALER-----------------------------
-
 void DEALER::giveOutCards(ELEMENT* elem){
 
     if (elem->getInitVolume() == 0)
@@ -118,3 +120,37 @@ void DEALER::exchange(ELEMENT* from, ELEMENT* to){
         to->addToSet(from->giveCard());
 }
 */
+
+CARD* DEALER::getBadge(SUIT s){
+    CARD *badge = deck->suit_badges[s];
+    badge->changeFaceState(UP);
+
+    return badge;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

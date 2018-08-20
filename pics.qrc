@@ -56,5 +56,9 @@
         <file>cards_pics/2/4/9.png</file>
         <file>cards_pics/README.txt</file>
         <file>cards_pics/0/0.png</file>
+        <file>cards_pics/1/1/0.png</file>
+        <file>cards_pics/1/2/0.png</file>
+        <file>cards_pics/2/3/0.png</file>
+        <file>cards_pics/2/4/0.png</file>
     </qresource>
 </RCC>

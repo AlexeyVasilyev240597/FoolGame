@@ -1,6 +1,8 @@
 #include <QObject>
 #include "Player.h"
 
+
+//------------------------------PLAYER-------------------------------------
 inline size_t getWeight(CARD *c, SUIT trump){
     return (int)ACE * (c->getSuit() == trump) + c->getRank();
 }
@@ -90,6 +92,8 @@ void FOOL_PLAYER::changeState(){
                                      state == FOOL_PLAYER::ADDING);
 }
 
+
+
 void FOOL_PLAYER::changeMoveValue(){
     my_move = !my_move;
 
@@ -99,8 +103,77 @@ void FOOL_PLAYER::changeMoveValue(){
                                      state == FOOL_PLAYER::ADDING);
 }
 /*
-void FOOL_PLAYER::iMistake(){
+void USER::iMistake(){
     emit choosedWrongCard(choosed_card);
     choosed_card = NULL;
 }
 */
+
+std::vector<CARD*>::iterator AI::getMinCard(CARD* less){
+    SUIT s = less == NULL ? NO_SUIT : less->getSuit();
+    RANK r = less == NULL ? NO_RANK : less->getRank();
+    std::vector<CARD*>::iterator it = my_set.begin();
+
+
+    return it;
+}
+
+void AI::aiChangeMoveValue(){
+    my_move = !my_move;
+
+    if (my_move){
+        switch (state){
+        case ATTACK:{
+            if (on_field == NULL){
+                choosed_card = my_set.front();
+                emit chooseIsMade();
+            }
+
+            else
+                emit itIsBeaten();
+            /*потом нужно выбирать наименьшую некозырную
+             * или наименьшую козырную, если этого сделать не удалось*/
+            /*
+            if (on_field == NULL)
+                for (std::vector<CARD*>::iterator it = my_set.begin(); it != my_set.end(); it++)
+                    if ((*it)->getSuit() != trump && (*it)->getRank() < choosed_card->getRank())
+                        choosed_card = (*it);
+            */
+            }
+            break;
+
+        case DEFENCE:{
+           if (on_field->getSuit() == trump)
+             for (std::vector<CARD*>::iterator it = my_set.begin(); it != my_set.end(); it++)
+                 if((*it)->getSuit() == trump &&
+                    (*it)->getRank() > on_field->getRank())
+                        choosed_card = (*it);
+
+
+            else
+             for (std::vector<CARD*>::iterator it = my_set.begin(); it != my_set.end(); it++)
+                 if (((*it)->getSuit() == on_field->getSuit() &&
+                         (*it)->getRank() > on_field->getRank()) ||
+                         (*it)->getSuit() == trump)
+                        choosed_card = (*it);
+
+            if (choosed_card != NULL)
+                emit chooseIsMade();
+            else
+                emit iTakeIt();
+            }
+            break;
+
+        case ADDING:
+            emit takeAway();
+            break;
+
+        }
+    }
+}
+
+void AI::trownCardToField(CARD* card, bool inAttack, size_t /*index*/){
+    if (!my_move && inAttack)
+        on_field = card;
+        //on_field.push_back(card);
+}

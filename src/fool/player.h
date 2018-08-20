@@ -23,20 +23,7 @@
 
 class FOOL_PLAYER: public QObject, public ELEMENT{
 Q_OBJECT
-private:
-    //bool is_user{false};
-
-    SUIT trump{NO_SUIT};
-
-    //void sortSet();
-public:
-        enum PLAYER_STATE{ATTACK, DEFENCE, ADDING, TAKING, NO_DEF} state{NO_DEF};
-
 signals:
-    void addedToSet(std::vector<CARD*>& set);
-
-    void removedFromSet(std::vector<CARD*>& set, std::vector<CARD*>& cards_to_remove);
-
     void chooseIsMade();
 
     void itIsBeaten();
@@ -45,17 +32,27 @@ signals:
 
     void takeAway();
 
-    //потом сигнал понадобится для графического отображения сигнала об ошибке!
-    //void choosedWrongCard(CARD*);
+    void addedToSet(std::vector<CARD*>& set);
+
+    void removedFromSet(std::vector<CARD*>& set, std::vector<CARD*>& cards_to_remove);
 
     void customizeButtons(bool cards, bool beaten, bool take, bool take_away);
 
+    //потом сигнал понадобится для графического отображения сигнала об ошибке!
+    //void choosedWrongCard(CARD*);
+
 public:
+    enum PLAYER_STATE{ATTACK, DEFENCE, ADDING, TAKING, NO_DEF} state{NO_DEF};
+
+    SUIT trump{NO_SUIT};
+
     bool my_move{false};
 
     QString name;
 
-    CARD *choosed_card{NULL};       
+    CARD *choosed_card{NULL};
+
+    void addToSet(std::vector<CARD*> cards);
 
     FOOL_PLAYER(size_t iv, const QString n) : ELEMENT(TO_HOLDER, iv){name = n;}
 
@@ -63,9 +60,7 @@ public:
 
     void setTrump(SUIT tr){ trump = tr; }
 
-    void showMinTrump();
-
-    void addToSet(std::vector<CARD*> cards);
+    virtual void showMinTrump();
 
     void initState(PLAYER_STATE s);
 
@@ -80,5 +75,42 @@ public slots:
     //потом сигнал понадобится для графического отображения сигнала об ошибке!
     //void iMistake();
 };
+/*
+class USER: public QObject, public FOOL_PLAYER{
+Q_OBJECT
+signals:
+    void addedToSet(std::vector<CARD*>& set);
 
+    void removedFromSet(std::vector<CARD*>& set, std::vector<CARD*>& cards_to_remove);
+
+    void customizeButtons(bool cards, bool beaten, bool take, bool take_away);
+
+public:
+    void addToSet(std::vector<CARD*> cards);
+
+public slots:
+    void changeCard(CARD*);
+
+    void changeMoveValue();
+};
+*/
+
+class AI: public FOOL_PLAYER{
+Q_OBJECT
+private:
+    //std::vector<CARD*> on_field;
+    CARD* on_field{NULL};
+
+    size_t opponent_cards_counter{0};
+
+    std::vector<CARD*>::iterator getMinCard(CARD* less = NULL);
+
+public:
+    AI(size_t i_v, QString name):FOOL_PLAYER(i_v, name){}
+
+public slots:
+    void aiChangeMoveValue();
+
+    void trownCardToField(CARD* card, bool inAttack, size_t index);
+};
 #endif // PLAYER_H

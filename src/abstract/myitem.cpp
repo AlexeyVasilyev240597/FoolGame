@@ -34,7 +34,10 @@ void CARD_ITEM::paint(QPainter *painter,
 }
 
 //----------------------------------BUTTON----------------------------------
-void BUTTON::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/){
+void BUTTON::paint(QPainter *painter, const QStyleOptionGraphicsItem */*option*/, QWidget */*widget*/){    
+    //painter->setBackgroundMode(Qt::OpaqueMode);
+    painter->fillRect(QRect(0, 0,mWidth, mHeigth), QColor(255, 255, 255));
+
     painter->drawText(QRectF(0, 0, mWidth, mHeigth), Qt::AlignCenter, my_text);
     painter->drawRoundedRect(0, 0, mWidth, mHeigth, 5, 5);
 }
