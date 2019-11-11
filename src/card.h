@@ -6,6 +6,7 @@
 //#include <QString>
 
 enum SUIT{
+	UNKNOWN_SUIT,
     NO_SUIT,
     DIAMONDS,
     HEARTS,
@@ -15,6 +16,7 @@ enum SUIT{
 };
 
 constexpr char const * const SUIT_NAMES[END_SUIT] ={
+	"UNK",
     "NOT",
     "D",
     "H",
@@ -23,8 +25,8 @@ constexpr char const * const SUIT_NAMES[END_SUIT] ={
 };
 
 enum RANK{
+	UNKNOWN_RANK,
     NO_RANK,
-    JOKER,
     TWO,
     THREE,
     FOUR,
@@ -38,12 +40,13 @@ enum RANK{
     QUEEN,
     KING,
     ACE,
+	JOKER,
     END_RANK
 };
 
 constexpr char const * const RANK_NAMES[END_RANK] ={
+	"UNK",
     "NOT",
-    "JO",
     "2",
     "3",
     "4",
@@ -56,10 +59,12 @@ constexpr char const * const RANK_NAMES[END_RANK] ={
     "J",
     "Q",
     "K",
-    "A"
+    "A",
+	"JO"
 };
 
 enum COLOR{
+	UNKNOWN_COLOR,
     NO_COLOR,
     RED,
     BLACK,
@@ -67,62 +72,48 @@ enum COLOR{
 };
 
 constexpr char const * const COLOR_NAMES[END_COLOR] ={
+	"UNK",
     "NOT",
     "RED",
     "BLACK"
 };
 
-enum SIDE{
-    FACE,
-    BACK
-};
-
 class CARD{
 public:
     // closed card
-    CARD():m_suit(NO_SUIT),
-           m_rank(NO_RANK),
-           m_color(NO_COLOR),
-           m_side(BACK){}
+    CARD():m_suit(UNKNOWN_SUIT),
+           m_rank(UNKNOWN_RANK),
+           m_color(UNKNOWN_COLOR){}
 
     /**
         Constructor of CARD is very useful and flexible,
         it gives a possibility to create a CARD which you know about just color
-        or just rank etc. Even you can Think about red spades (like in "Interstate 60"),
-        but you should remember about it when you will use your creation!
+        or just rank etc.
     */
     // open card
     CARD(SUIT s, RANK r, COLOR c = NO_COLOR):m_suit(s),
-                                             m_rank(r),
-                                             m_color(c),
-                                             m_side(FACE){}
-
-    enum COMPARE{
-        bySuit,
-        byRank,
-        byColor,
-        byAll
-    };
-
-    bool isEqual(const CARD& l, const CARD& r, COMPARE comp = byAll) const
+                                             m_rank(r)
     {
-        switch (comp)
+        switch(s)
         {
-        case bySuit:
-            return l.m_suit == r.m_suit;
-        case byRank:
-            return l.m_rank == r.m_rank;
-        case byColor:
-            return l.m_color == r.m_color;
-        case byAll:
-            return l.m_suit == r.m_suit && l.m_rank == r.m_rank;
+            case DIAMONDS:
+            case HEARTS:
+                m_color = RED;
+                break;
+            case CLUBS:
+            case SPADES:
+                m_color = BLACK;
+            case NO_SUIT:
+                m_color = c;
+                break;
+            default:// UNKNOWN_SUIT:
+                m_color = UNKNOWN_COLOR;
         }
     }
 
-    SUIT getSuit(){return m_suit;}
-    RANK getRank(){return m_rank;}
-    COLOR getColor(){return m_color;}
-    SIDE getSide(){return m_side;}
+    SUIT getSuit() const { return m_suit; }
+    RANK getRank() const { return m_rank; }
+    COLOR getColor() const { return m_color; }
 
     //for Debug
     /*
@@ -134,13 +125,21 @@ public:
         return str;
     }
     */
+    CARD& operator= (const CARD& card)
+    {
+         m_suit = card.getSuit();
+         m_rank = card.getRank();
+         m_color = card.getColor();
+
+         return *this;
+    }
+
     ~CARD(){}
 
 private:
-    const SUIT m_suit;
-    const RANK m_rank;
-    const COLOR m_color;
-    const SIDE m_side;
+    SUIT m_suit;
+    RANK m_rank;
+    COLOR m_color;
 };
 
 // transfer to DECK_H
